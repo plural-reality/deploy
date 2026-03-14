@@ -7,11 +7,12 @@
 # configurationRevision is set in flake.nix via self.rev or self.dirtyRev.
 # Dirty trees produce "<hash>-dirty"; clean trees produce the commit hash.
 
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputRevisions, ... }:
 
 let
   versionJson = builtins.toJSON {
     configurationRevision = config.system.configurationRevision or "dirty";
+    inputs = inputRevisions;
     nixosVersion = config.system.nixos.version;
     hostname = config.networking.hostName;
   };

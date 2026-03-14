@@ -22,6 +22,7 @@
     }:
     let
       system = "aarch64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
 
       mkNode =
         {
@@ -29,12 +30,14 @@
           environment,
           domain,
           supabaseDomain,
-          smtp,
         }:
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
             sonar-frontend = sonar.packages.${system}.sonar;
+            inputRevisions = builtins.mapAttrs
+              (_: i: i.rev or i.dirtyRev or "unknown")
+              { inherit sonar nixpkgs sops-nix; };
           };
           modules = [
             sops-nix.nixosModules.sops
@@ -48,44 +51,70 @@
               system.configurationRevision = self.rev or self.dirtyRev or "dirty";
 
               sonar = {
-                inherit domain supabaseDomain smtp;
+                inherit domain supabaseDomain;
                 secretsEnvironment = environment;
                 deploy = {
                   enable = true;
                   nodeName = hostname;
+                  appInputs = {
+                    sonar = "github:plural-reality/baisoku-survey";
+                  };
                 };
               };
             }
           ];
         };
-    in
-    {
-      nixosConfigurations = {
-        sonar-prod = mkNode {
+
+      # Customer (non-NixOS) EC2: sonar wrapped with sops exec-env.
+      # Encrypted secrets live in nix store; decrypted in-memory at runtime via IAM/KMS.
+      mkCustomerPackage =
+        {
+          name,
+          secretsFile,
+        }:
+        let
+          sonarPkg = sonar.packages.${system}.sonar;
+        in
+        pkgs.writeShellApplication {
+          name = "sonar-${name}";
+          runtimeInputs = [
+            pkgs.sops
+            pkgs.nodejs_22
+          ];
+          text = ''
+            export NODE_ENV=production
+            export PORT=''${PORT:-3000}
+            export HOSTNAME=''${HOSTNAME:-0.0.0.0}
+            exec sops exec-env ${secretsFile} "node ${sonarPkg}/app/server.js"
+          '';
+        };
+      nodeDefinitions = {
+        sonar-prod = {
           hostname = "sonar-prod";
           environment = "prod";
           domain = "app.baisoku-survey.plural-reality.com";
           supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-          smtp = {
-            host = "smtp.resend.com";
-            port = 465;
-            user = "resend";
-            adminEmail = "noreply@plural-reality.com";
-          };
         };
-
-        sonar-staging = mkNode {
+        sonar-staging = {
           hostname = "sonar-staging";
           environment = "staging";
           domain = "staging.baisoku-survey.plural-reality.com";
           supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
-          smtp = {
-            host = "smtp.resend.com";
-            port = 465;
-            user = "resend";
-            adminEmail = "noreply@plural-reality.com";
-          };
         };
       };
+    in
+    {
+      nixosConfigurations =
+        builtins.mapAttrs (_: cfg: mkNode cfg) nodeDefinitions;
+
+      packages.${system} = {
+        cybozu-prd = mkCustomerPackage {
+          name = "cybozu-prd";
+          secretsFile = ./secrets/cybozu-prd.yaml;
+        };
+      };
+
+      # Lightweight metadata for tooling — evaluates without building NixOS configs.
+      meta.nodes = builtins.mapAttrs (_: cfg: { inherit (cfg) domain; }) nodeDefinitions;
     };
 }

@@ -24,30 +24,6 @@ in
       description = "The domain name for Supabase API";
     };
 
-    smtp = {
-      host = lib.mkOption {
-        type = lib.types.str;
-        description = "SMTP server hostname";
-      };
-      port = lib.mkOption {
-        type = lib.types.port;
-        default = 587;
-        description = "SMTP server port";
-      };
-      user = lib.mkOption {
-        type = lib.types.str;
-        description = "SMTP username";
-      };
-      adminEmail = lib.mkOption {
-        type = lib.types.str;
-        description = "SMTP admin/sender email address";
-      };
-      senderName = lib.mkOption {
-        type = lib.types.str;
-        default = "Sonar";
-        description = "SMTP sender display name";
-      };
-    };
 
     acmeEmail = lib.mkOption {
       type = lib.types.str;

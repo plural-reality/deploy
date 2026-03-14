@@ -63,6 +63,10 @@ EOF
     exec "$@"
   '';
 
+  overrideFlags = lib.concatStringsSep " " (
+    lib.mapAttrsToList (name: url: ''--override-input ${name} "${url}"'') cfg.appInputs
+  );
+
   deployScript = pkgs.writeShellScript "sonar-deploy" ''
     set -euo pipefail
 
@@ -102,11 +106,13 @@ EOF
 
     echo "=== Generating GitHub App token for nix ==="
     NIX_GITHUB_TOKEN=$(${generateGitHubToken})
+    NIX_ACCESS="--option access-tokens github.com=$NIX_GITHUB_TOKEN"
 
     echo "=== Building NixOS configuration: ${cfg.nodeName} ==="
     /run/current-system/sw/bin/nixos-rebuild switch \
       --flake "${repoDir}#${cfg.nodeName}" \
-      --option access-tokens "github.com=$NIX_GITHUB_TOKEN"
+      ${overrideFlags} \
+      $NIX_ACCESS
 
     echo "=== Restarting Supabase ==="
     ${pkgs.systemd}/bin/systemctl restart supabase.service
@@ -191,6 +197,13 @@ in
       type = lib.types.str;
       default = "https://github.com/plural-reality/deploy.git";
       description = "Git repository HTTPS URL";
+    };
+
+    appInputs = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = "Flake inputs to override with latest (input name -> flake URL)";
+      example = { sonar = "github:plural-reality/baisoku-survey"; };
     };
   };
 
