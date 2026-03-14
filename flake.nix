@@ -7,7 +7,7 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # App repo provides packages.sonar — the production Next.js build artifact.
+    # App repo provides packages.sonar-frontend — the production Next.js build artifact.
     # Don't follows nixpkgs: let app use its own pin for build reproducibility.
     sonar.url = "github:plural-reality/baisoku-survey";
   };
@@ -35,7 +35,7 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            sonar-frontend = sonar.packages.${system}.sonar;
+            sonar-frontend = sonar.packages.${system}.sonar-frontend;
             inputRevisions = builtins.mapAttrs (_: i: i.rev or i.dirtyRev or "unknown") {
               inherit sonar nixpkgs sops-nix;
             };
@@ -75,7 +75,7 @@
           secretsFile,
         }:
         let
-          sonarPkg = sonar.packages.${system}.sonar;
+          sonarPkg = sonar.packages.${system}.sonar-frontend;
         in
         pkgs.writeShellApplication {
           name = "sonar-${name}";
