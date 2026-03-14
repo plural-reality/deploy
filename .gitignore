@@ -1,0 +1,12 @@
+# Terraform
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/infra-sonar-*.json
+tfc-bootstrap/.terraform/
+tfc-bootstrap/terraform.tfstate
+tfc-bootstrap/terraform.tfstate.backup
+
+# Nix
+result
+result-*

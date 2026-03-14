@@ -1,0 +1,5 @@
+locals {
+  developers = [
+    "yui-nishimura",
+  ]
+}
