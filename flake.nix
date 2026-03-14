@@ -2,7 +2,7 @@
   description = "Sonar deployment — NixOS configurations for stg/prd EC2 instances";
 
   inputs = {
-    nixpkgs.url = "github:numtide/nixpkgs-unfree?ref=nixos-25.11";
+    nixpkgs.url = "github:numtide/nixpkgs-unfree?ref=nixos-unstable";
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -30,14 +30,15 @@
           environment,
           domain,
           supabaseDomain,
+          refPattern ? "^refs/heads/main$",
         }:
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
             sonar-frontend = sonar.packages.${system}.sonar;
-            inputRevisions = builtins.mapAttrs
-              (_: i: i.rev or i.dirtyRev or "unknown")
-              { inherit sonar nixpkgs sops-nix; };
+            inputRevisions = builtins.mapAttrs (_: i: i.rev or i.dirtyRev or "unknown") {
+              inherit sonar nixpkgs sops-nix;
+            };
           };
           modules = [
             sops-nix.nixosModules.sops
@@ -56,6 +57,7 @@
                 deploy = {
                   enable = true;
                   nodeName = hostname;
+                  inherit refPattern;
                   appInputs = {
                     sonar = "github:plural-reality/baisoku-survey";
                   };
@@ -94,6 +96,7 @@
           environment = "prod";
           domain = "app.baisoku-survey.plural-reality.com";
           supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
+          refPattern = "^refs/tags/v";
         };
         sonar-staging = {
           hostname = "sonar-staging";
@@ -104,8 +107,7 @@
       };
     in
     {
-      nixosConfigurations =
-        builtins.mapAttrs (_: cfg: mkNode cfg) nodeDefinitions;
+      nixosConfigurations = builtins.mapAttrs (_: cfg: mkNode cfg) nodeDefinitions;
 
       packages.${system} = {
         cybozu-prd = mkCustomerPackage {
