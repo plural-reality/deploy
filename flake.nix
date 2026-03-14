@@ -35,7 +35,7 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            sonar-frontend = sonar.packages.${system}.sonar;
+            sonar-frontend = sonar.packages.${system}.sonar-frontend;
             inputRevisions = builtins.mapAttrs (_: i: i.rev or i.dirtyRev or "unknown") {
               inherit sonar nixpkgs sops-nix;
             };
@@ -75,7 +75,7 @@
           secretsFile,
         }:
         let
-          sonarPkg = sonar.packages.${system}.sonar;
+          sonarPkg = sonar.packages.${system}.sonar-frontend;
         in
         pkgs.writeShellApplication {
           name = "sonar-${name}";
