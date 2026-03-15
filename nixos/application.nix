@@ -42,6 +42,7 @@ in
     # --- nginx reverse proxy ---
     services.nginx = {
       enable = true;
+      serverNamesHashBucketSize = 128;
       recommendedTlsSettings = true;
       recommendedOptimisation = true;
       recommendedGzipSettings = true;
