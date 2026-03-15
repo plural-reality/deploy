@@ -69,14 +69,6 @@ in
       path = "/run/secrets/github-app-private-key";
     };
 
-    # Webhook HMAC secret (from ci.yaml)
-    secrets."webhook_secret" = {
-      sopsFile = ../secrets/ci.yaml;
-      owner = "root";
-      mode = "0400";
-      path = "/run/secrets/webhook-secret";
-    };
-
     # --- Rendered templates ---
 
     # Docker Compose .env for Supabase

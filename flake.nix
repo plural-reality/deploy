@@ -30,7 +30,7 @@
           environment,
           domain,
           supabaseDomain,
-          refPattern ? "^refs/heads/main$",
+          trackBranch ? "main",
         }:
         nixpkgs.lib.nixosSystem {
           inherit system;
@@ -58,7 +58,7 @@
                 deploy = {
                   enable = true;
                   nodeName = hostname;
-                  inherit refPattern;
+                  inherit trackBranch;
                   appInputs = {
                     sonar = "github:plural-reality/baisoku-survey";
                   };
@@ -97,7 +97,7 @@
           environment = "prod";
           domain = "app.baisoku-survey.plural-reality.com";
           supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-          refPattern = "^refs/tags/v";
+          trackBranch = "main";
         };
         sonar-staging = {
           hostname = "sonar-staging";

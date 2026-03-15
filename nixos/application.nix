@@ -67,14 +67,7 @@ in
           '';
         };
 
-        # Webhook endpoint for self-deploy
-        locations."/.well-known/deploy" = {
-          proxyPass = "http://127.0.0.1:9000/hooks/deploy";
-          extraConfig = ''
-            proxy_read_timeout 600;
-          '';
-        };
-      };
+};
 
       # Supabase domain -> Kong
       virtualHosts."${config.sonar.supabaseDomain}" = {

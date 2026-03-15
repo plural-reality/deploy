@@ -1,6 +1,6 @@
-# Webhook-triggered self-deploy
-# EC2 receives GitHub push webhooks, verifies HMAC, pulls code via GitHub App
-# installation tokens, and applies via nixos-rebuild switch.
+# Polling-based self-deploy
+# EC2 polls the deploy repo for changes via systemd timer,
+# pulls via GitHub App installation tokens, and applies via nixos-rebuild switch.
 {
   config,
   lib,
@@ -11,8 +11,9 @@
 let
   cfg = config.sonar.deploy;
   repoDir = "/var/lib/sonar-deploy/repo";
+  git = "${pkgs.git}/bin/git";
 
-  # Shared: generate a short-lived GitHub App installation token from SOPS credentials.
+  # Generate a short-lived GitHub App installation token from SOPS credentials.
   # Outputs the token to stdout. Used by both git operations and nix flake fetching.
   generateGitHubToken = pkgs.writeShellScript "generate-github-token" ''
     set -euo pipefail
@@ -74,31 +75,16 @@ EOF
     exec 200>"$LOCK"
     ${pkgs.util-linux}/bin/flock -n 200 || { echo "Deploy already running, skipping"; exit 0; }
 
-    REF="$1"
-    echo "=== Deploy started: ref=$REF at $(date -Iseconds) ==="
     cd "${repoDir}"
 
-    if [ "$(${pkgs.git}/bin/git remote get-url origin)" != "${cfg.repoUrl}" ]; then
-      ${pkgs.git}/bin/git remote set-url origin "${cfg.repoUrl}"
+    if [ "$(${git} remote get-url origin)" != "${cfg.repoUrl}" ]; then
+      ${git} remote set-url origin "${cfg.repoUrl}"
     fi
 
-    ${gitWithGitHubApp} ${pkgs.git}/bin/git fetch origin
+    ${gitWithGitHubApp} ${git} fetch origin
 
-    case "$REF" in
-      refs/tags/*)
-        TAG="''${REF#refs/tags/}"
-        ${pkgs.git}/bin/git checkout "$TAG"
-        ;;
-      refs/heads/*)
-        BRANCH="''${REF#refs/heads/}"
-        ${pkgs.git}/bin/git checkout "$BRANCH"
-        ${gitWithGitHubApp} ${pkgs.git}/bin/git pull origin "$BRANCH" --ff-only
-        ;;
-      *)
-        echo "ERROR: Unknown ref format: $REF"
-        exit 1
-        ;;
-    esac
+    ${git} checkout "${cfg.trackBranch}"
+    ${gitWithGitHubApp} ${git} pull origin "${cfg.trackBranch}" --ff-only
 
     # Record current generation for rollback
     PREV_SYSTEM=$(readlink /run/current-system)
@@ -130,56 +116,24 @@ EOF
     echo "=== Deploy complete at $(date -Iseconds). Smoke test passed. ==="
   '';
 
-  triggerScript = pkgs.writeShellScript "trigger-deploy" ''
-    REF="$1"
-    ${pkgs.systemd}/bin/systemd-run \
-      --unit="sonar-deploy-$(${pkgs.coreutils}/bin/date +%s)" \
-      --description="Sonar deploy: $REF" \
-      --no-block \
-      ${deployScript} "$REF"
-    echo "Deploy triggered for $REF"
-  '';
+  pollScript = pkgs.writeShellScript "deploy-poll" ''
+    set -euo pipefail
+    cd "${repoDir}"
 
-  hooksTemplate = pkgs.writeText "hooks-template.json" (builtins.toJSON [
-    {
-      id = "deploy";
-      execute-command = toString triggerScript;
-      pass-arguments-to-command = [
-        {
-          source = "payload";
-          name = "ref";
-        }
-      ];
-      trigger-rule = {
-        "and" = [
-          {
-            match = {
-              type = "payload-hmac-sha256";
-              secret = "__WEBHOOK_SECRET__";
-              parameter = {
-                source = "header";
-                name = "X-Hub-Signature-256";
-              };
-            };
-          }
-          {
-            match = {
-              type = "regex";
-              regex = cfg.refPattern;
-              parameter = {
-                source = "payload";
-                name = "ref";
-              };
-            };
-          }
-        ];
-      };
-    }
-  ]);
+    ${gitWithGitHubApp} ${git} fetch origin
+
+    LOCAL=$(${git} rev-parse HEAD)
+    REMOTE=$(${git} rev-parse "origin/${cfg.trackBranch}")
+
+    [ "$LOCAL" != "$REMOTE" ] || { echo "No changes on ${cfg.trackBranch} ($LOCAL)"; exit 0; }
+
+    echo "Change detected: $LOCAL -> $REMOTE"
+    exec ${deployScript}
+  '';
 in
 {
   options.sonar.deploy = {
-    enable = lib.mkEnableOption "self-deploy webhook";
+    enable = lib.mkEnableOption "polling-based self-deploy";
 
     nodeName = lib.mkOption {
       type = lib.types.str;
@@ -187,10 +141,10 @@ in
       example = "sonar-prod";
     };
 
-    refPattern = lib.mkOption {
+    trackBranch = lib.mkOption {
       type = lib.types.str;
-      description = "Regex to filter GitHub push refs";
-      default = "^refs/heads/main$";
+      default = "main";
+      description = "Remote branch to track for changes";
     };
 
     repoUrl = lib.mkOption {
@@ -204,6 +158,12 @@ in
       default = { };
       description = "Flake inputs to override with latest (input name -> flake URL)";
       example = { sonar = "github:plural-reality/baisoku-survey"; };
+    };
+
+    pollInterval = lib.mkOption {
+      type = lib.types.str;
+      default = "5min";
+      description = "How often to poll for changes";
     };
   };
 
@@ -221,41 +181,41 @@ in
           set -euo pipefail
           if [ -d "${repoDir}/.git" ]; then
             cd "${repoDir}"
-            if [ "$(${pkgs.git}/bin/git remote get-url origin)" != "${cfg.repoUrl}" ]; then
-              ${pkgs.git}/bin/git remote set-url origin "${cfg.repoUrl}"
+            if [ "$(${git} remote get-url origin)" != "${cfg.repoUrl}" ]; then
+              ${git} remote set-url origin "${cfg.repoUrl}"
             fi
             echo "Repo already cloned at ${repoDir}"
             exit 0
           fi
           ${pkgs.coreutils}/bin/mkdir -p "$(dirname "${repoDir}")"
-          ${gitWithGitHubApp} ${pkgs.git}/bin/git clone "${cfg.repoUrl}" "${repoDir}"
+          ${gitWithGitHubApp} ${git} clone "${cfg.repoUrl}" "${repoDir}"
           echo "Repo cloned to ${repoDir}"
         '';
       };
     };
 
-    systemd.services.deploy-webhook = {
-      description = "GitHub webhook receiver for self-deploy";
+    systemd.services.deploy-poll = {
+      description = "Poll deploy repo and apply changes";
       after = [
         "network-online.target"
         "deploy-repo-init.service"
       ];
       wants = [ "network-online.target" ];
-      requires = [
-        "deploy-repo-init.service"
-      ];
-      wantedBy = [ "multi-user.target" ];
+      requires = [ "deploy-repo-init.service" ];
 
       serviceConfig = {
-        ExecStartPre = pkgs.writeShellScript "generate-hooks" ''
-          SECRET=$(cat /run/secrets/webhook-secret)
-          ${pkgs.gnused}/bin/sed "s|__WEBHOOK_SECRET__|$SECRET|g" \
-            ${hooksTemplate} > /run/deploy-webhook/hooks.json
-        '';
-        ExecStart = "${pkgs.webhook}/bin/webhook -hooks /run/deploy-webhook/hooks.json -port 9000 -verbose";
-        Restart = "always";
-        RestartSec = 5;
-        RuntimeDirectory = "deploy-webhook";
+        Type = "oneshot";
+        ExecStart = pollScript;
+      };
+    };
+
+    systemd.timers.deploy-poll = {
+      description = "Poll deploy repo for changes";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnBootSec = "2min";
+        OnUnitActiveSec = cfg.pollInterval;
+        RandomizedDelaySec = "30s";
       };
     };
   };
