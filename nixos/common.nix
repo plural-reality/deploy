@@ -78,8 +78,12 @@
     users.groups.sonar = { };
 
     # --- IMDS route (Docker veth interfaces steal 169.254.0.0/16) ---
+    # Policy routing: a dedicated table (100) with a high-priority rule.
+    # Docker only modifies the main table; this survives any bridge/veth changes.
     networking.localCommands = ''
-      ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5
+      ${pkgs.iproute2}/bin/ip rule del to 169.254.169.254/32 lookup 100 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip rule add to 169.254.169.254/32 lookup 100 priority 100
+      ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5 table 100
     '';
 
     # --- Firewall ---

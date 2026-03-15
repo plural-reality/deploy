@@ -240,6 +240,7 @@ in
         "network-online.target"
         "deploy-repo-init.service"
       ];
+      wants = [ "network-online.target" ];
       requires = [
         "deploy-repo-init.service"
       ];

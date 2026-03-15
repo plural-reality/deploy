@@ -99,6 +99,7 @@ in
         "network-online.target"
         "deploy-repo-init.service"
       ];
+      wants = [ "network-online.target" ];
       requires = [
         "docker.service"
         "deploy-repo-init.service"
@@ -155,7 +156,9 @@ in
         User = "sonar";
         Group = "sonar";
         WorkingDirectory = "${sonar-frontend}/app";
-        ExecStart = "${pkgs.nodejs_22}/bin/node ${sonar-frontend}/app/server.js";
+        # Use the sonar wrapper: validates env vars via sonar-check-env, then
+        # starts Node.js from the app's own nixpkgs (not deploy's pkgs.nodejs_22).
+        ExecStart = "${sonar-frontend}/bin/sonar";
         EnvironmentFile = config.sops.templates."nextjs-env".path;
         Restart = "always";
         RestartSec = 5;
