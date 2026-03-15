@@ -4,7 +4,7 @@
   pkgs,
   lib,
   config,
-  sonar-frontend,
+  sonar-app,
   ...
 }:
 
@@ -155,10 +155,10 @@ in
         Type = "simple";
         User = "sonar";
         Group = "sonar";
-        WorkingDirectory = "${sonar-frontend}/app";
+        WorkingDirectory = "${sonar-app}/app";
         # Use the sonar wrapper: validates env vars via sonar-check-env, then
         # starts Node.js from the app's own nixpkgs (not deploy's pkgs.nodejs_22).
-        ExecStart = "${sonar-frontend}/bin/sonar";
+        ExecStart = "${sonar-app}/bin/sonar";
         EnvironmentFile = config.sops.templates."nextjs-env".path;
         Restart = "always";
         RestartSec = 5;
