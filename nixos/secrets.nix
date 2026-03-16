@@ -38,21 +38,6 @@ in
       "resend_api_key" = { };
     };
 
-    # Self-deploy SSH keys — one per repo (GitHub deploy key limitation)
-    # Both keys live in secrets/ssh/deploy.yaml under "deploy" and "sonar" fields.
-    secrets."deploy_ssh_key_infra" = {
-      sopsFile = ../secrets/ssh/deploy.yaml;
-      key = "deploy";
-      owner = "root";
-      mode = "0400";
-    };
-    secrets."deploy_ssh_key_app" = {
-      sopsFile = ../secrets/ssh/deploy.yaml;
-      key = "sonar";
-      owner = "root";
-      mode = "0400";
-    };
-
     # --- Rendered templates ---
 
     # Docker Compose .env for Supabase

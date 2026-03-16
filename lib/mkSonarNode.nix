@@ -4,7 +4,6 @@
 {
   mkNixOSNode,
   sonarPackage,
-  sonarUrl,
   lib,
 }:
 hostname:
@@ -16,11 +15,9 @@ mkNixOSNode {
     {
       sonar = {
         package = sonarPackage;
-        inputUrl = sonarUrl;
         supabaseSource = ../supabase;
         inherit domain supabaseDomain;
         secretsEnvironment = lib.removePrefix "sonar-" hostname;
-        deploy.enable = true;
       };
     }
   ];

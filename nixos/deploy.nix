@@ -1,39 +1,47 @@
 # Polling-based self-deploy via system.autoUpgrade.
-# Rebuilds from plural-reality/deploy#<hostname> every minute (over SSH),
-# with --override-input sonar to track latest app rev.
-#
-# Two SSH keys are needed because GitHub deploy keys are per-repo.
-# SSH host aliases route each repo to its own key.
+# Two SSH keys (GitHub deploy key = per-repo) with host aliases.
 { config, lib, ... }:
 {
-  options.sonar.deploy.enable = lib.mkEnableOption "polling-based self-deploy";
-
-  config = lib.mkIf config.sonar.deploy.enable {
-    system.autoUpgrade = {
-      enable = true;
-      flake = "git+ssh://git@github-infra/plural-reality/deploy#${config.networking.hostName}";
-      flags = [
-        "--override-input" "sonar" config.sonar.inputUrl
-        "--refresh"
-        "--option" "fallback" "false"
-      ];
-      dates = "minutely";
-      randomizedDelaySec = "30s";
-      allowReboot = false;
+  sops = {
+    age = { };
+    secrets."deploy_ssh_key_infra" = {
+      sopsFile = ../secrets/ssh/deploy.yaml;
+      key = "deploy";
+      owner = "root";
+      mode = "0400";
     };
+    secrets."deploy_ssh_key_app" = {
+      sopsFile = ../secrets/ssh/deploy.yaml;
+      key = "sonar";
+      owner = "root";
+      mode = "0400";
+    };
+  };
 
-    programs.ssh.extraConfig = let
-      mkAlias = name: identityFile: ''
-        Host ${name}
-          HostName github.com
-          IdentityFile ${identityFile}
-          IdentitiesOnly yes
-          StrictHostKeyChecking accept-new
-          UserKnownHostsFile /dev/null
-      '';
-    in lib.concatStrings [
-      (mkAlias "github-infra" config.sops.secrets."deploy_ssh_key_infra".path)
-      (mkAlias "github-app" config.sops.secrets."deploy_ssh_key_app".path)
+  programs.ssh.extraConfig = let
+    mkAlias = name: identityFile: ''
+      Host ${name}
+        HostName github.com
+        IdentityFile ${identityFile}
+        IdentitiesOnly yes
+        StrictHostKeyChecking accept-new
+        UserKnownHostsFile /dev/null
+    '';
+  in lib.concatStrings [
+    (mkAlias "github-infra" config.sops.secrets."deploy_ssh_key_infra".path)
+    (mkAlias "github-app" config.sops.secrets."deploy_ssh_key_app".path)
+  ];
+
+  system.autoUpgrade = {
+    enable = true;
+    flake = "git+ssh://git@github-infra/plural-reality/deploy#${config.networking.hostName}";
+    flags = [
+      "--override-input" "sonar" "git+ssh://git@github-app/plural-reality/baisoku-survey"
+      "--refresh"
+      "--option" "fallback" "false"
     ];
+    dates = "minutely";
+    randomizedDelaySec = "30s";
+    allowReboot = false;
   };
 }

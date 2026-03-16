@@ -15,11 +15,6 @@
       description = "Sonar application package";
     };
 
-    inputUrl = lib.mkOption {
-      type = lib.types.str;
-      description = "Flake URL of the sonar input (for --override-input in self-deploy)";
-    };
-
     supabaseSource = lib.mkOption {
       type = lib.types.path;
       description = "Path to supabase configuration directory";

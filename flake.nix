@@ -27,8 +27,6 @@
         inherit mkNixOSNode;
         inherit (nixpkgs) lib;
         sonarPackage = sonar.packages.${system}.sonar;
-        # deploy-time URL uses SSH host alias (github-app) for key routing
-        sonarUrl = "git+ssh://git@github-app/plural-reality/baisoku-survey";
       };
       mkCustomerPackage = import ./lib/mkCustomerPackage.nix {
         pkgs = nixpkgs.legacyPackages.${system};
@@ -48,7 +46,7 @@
       } // {
         sonar-staging-bootstrap = mkNixOSNode {
           hostname = "sonar-staging";
-          modules = [ ./nixos/bootstrap.nix ];
+          modules = [ ./nixos/deploy.nix ];
         };
       };
 

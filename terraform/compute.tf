@@ -46,7 +46,7 @@ resource "aws_instance" "app" {
   }
 
   tags = {
-    Name = "${local.name_prefix}-${each.key}-app"
+    Name = "${local.name_prefix}-${each.key}"
   }
 
   lifecycle {
