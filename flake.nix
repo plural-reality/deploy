@@ -7,8 +7,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # App repo provides packages.sonar — the production Next.js build artifact.
-    # Don't follows nixpkgs: let app use its own pin for build reproducibility.
     sonar.url = "git+ssh://git@github.com/plural-reality/baisoku-survey";
   };
 
@@ -30,13 +28,13 @@
           environment,
           domain,
           supabaseDomain,
-          trackBranch ? "main",
         }:
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
             sonar-app = sonar.packages.${system}.sonar;
             inherit (sonar) envContract;
+            sonarInputUrl = sonar.url;
           };
           modules = [
             sops-nix.nixosModules.sops
@@ -52,14 +50,7 @@
               sonar = {
                 inherit domain supabaseDomain;
                 secretsEnvironment = environment;
-                deploy = {
-                  enable = true;
-                  nodeName = hostname;
-                  inherit trackBranch;
-                  appInputs = {
-                    sonar = "git+ssh://git@github.com/plural-reality/baisoku-survey";
-                  };
-                };
+                deploy.enable = true;
               };
             }
           ];
@@ -94,7 +85,6 @@
         #   environment = "prod";
         #   domain = "app.baisoku-survey.plural-reality.com";
         #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-        #   trackBranch = "main";
         # };
         sonar-staging = {
           hostname = "sonar-staging";

@@ -1,32 +1,29 @@
 # Polling-based self-deploy
-# Builds from github: flake URL (no local clone), compares store paths,
-# and uses switch-to-configuration test → smoke → commit for safe rollback.
+# Every pollInterval, rebuilds from github:plural-reality/deploy#<hostname>
+# with --override-input sonar to track latest app rev.
+# Uses switch-to-configuration test → smoke → commit for safe rollback.
 {
   config,
   lib,
   pkgs,
+  sonarInputUrl,
   ...
 }:
 
 let
   cfg = config.sonar.deploy;
+  hostname = config.networking.hostName;
   sshKeyPath = "/run/secrets/deploy-ssh-key";
   gitSshCommand = "${pkgs.openssh}/bin/ssh -i ${sshKeyPath} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null";
 
-  overrideFlags = lib.concatLists (
-    lib.mapAttrsToList (name: url: [
-      "--override-input"
-      name
-      url
-    ]) cfg.appInputs
-  );
+  flakeRef = "github:plural-reality/deploy#${hostname}";
 
   deployScript = pkgs.writeShellScript "sonar-deploy" ''
     set -euo pipefail
 
     /run/current-system/sw/bin/nixos-rebuild build \
-      --flake "github:plural-reality/deploy/${cfg.trackBranch}#${cfg.nodeName}" \
-      ${lib.concatStringsSep " " (map lib.escapeShellArg overrideFlags)} \
+      --flake ${lib.escapeShellArg flakeRef} \
+      --override-input sonar ${lib.escapeShellArg sonarInputUrl} \
       --refresh
 
     NEW=$(readlink -f result)
@@ -53,15 +50,6 @@ in
 {
   options.sonar.deploy = {
     enable = lib.mkEnableOption "polling-based self-deploy";
-    nodeName = lib.mkOption { type = lib.types.str; };
-    trackBranch = lib.mkOption {
-      type = lib.types.str;
-      default = "main";
-    };
-    appInputs = lib.mkOption {
-      type = lib.types.attrsOf lib.types.str;
-      default = { };
-    };
     pollInterval = lib.mkOption {
       type = lib.types.str;
       default = "1min";
@@ -70,7 +58,7 @@ in
 
   config = lib.mkIf cfg.enable {
     systemd.services.deploy-poll = {
-      description = "Poll and deploy NixOS configuration";
+      description = "Poll and deploy ${hostname}";
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
       environment.GIT_SSH_COMMAND = gitSshCommand;
