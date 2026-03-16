@@ -45,6 +45,11 @@
         #   domain = "app.baisoku-survey.plural-reality.com";
         #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
         # };
+      } // {
+        sonar-staging-bootstrap = mkNixOSNode {
+          hostname = "sonar-staging";
+          modules = [ ./nixos/bootstrap.nix ];
+        };
       };
 
       # --- Customer (non-NixOS) Packages ---

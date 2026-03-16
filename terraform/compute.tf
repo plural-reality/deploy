@@ -93,29 +93,8 @@ resource "aws_iam_role_policy" "kms_decrypt" {
         Action   = ["kms:Decrypt", "kms:DescribeKey"]
         Resource = [var.kms_key_arn]
       },
-      {
-        Effect   = "Allow"
-        Action   = ["ssm:GetParameter"]
-        Resource = [aws_ssm_parameter.deploy_ssh_key.arn]
-      }
     ]
   })
-}
-
-# --- Bootstrap: deploy SSH key in SSM (mirrors SOPS source of truth) ---
-data "sops_file" "deploy_key" {
-  source_file = "${path.module}/../secrets/ssh/deploy.yaml"
-}
-
-resource "aws_ssm_parameter" "deploy_ssh_key" {
-  name   = "/${local.name_prefix}/deploy-ssh-key"
-  type   = "SecureString"
-  key_id = var.kms_key_arn
-  value  = data.sops_file.deploy_key.data["sonar"]
-
-  tags = {
-    Name = "${local.name_prefix}-deploy-ssh-key"
-  }
 }
 
 resource "aws_iam_instance_profile" "ec2_sops" {
