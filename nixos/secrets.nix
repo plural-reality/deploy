@@ -47,26 +47,13 @@ in
       "resend_api_key" = { };
     };
 
-    # Self-deploy GitHub App credentials (from ci.yaml)
-    secrets."github_app_id" = {
-      sopsFile = ../secrets/ci.yaml;
+    # Self-deploy SSH key (from secrets/ssh/deploy.yaml)
+    secrets."deploy_ssh_key" = {
+      sopsFile = ../secrets/ssh/deploy.yaml;
+      key = "data";
       owner = "root";
       mode = "0400";
-      path = "/run/secrets/github-app-id";
-    };
-
-    secrets."github_app_installation_id" = {
-      sopsFile = ../secrets/ci.yaml;
-      owner = "root";
-      mode = "0400";
-      path = "/run/secrets/github-app-installation-id";
-    };
-
-    secrets."github_app_private_key" = {
-      sopsFile = ../secrets/ci.yaml;
-      owner = "root";
-      mode = "0400";
-      path = "/run/secrets/github-app-private-key";
+      path = "/run/secrets/deploy-ssh-key";
     };
 
     # --- Rendered templates ---

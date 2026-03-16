@@ -9,10 +9,6 @@ terraform {
       source  = "cloudflare/cloudflare"
       version = "~> 4.0"
     }
-    github = {
-      source  = "integrations/github"
-      version = "~> 6.0"
-    }
     sops = {
       source  = "carlpett/sops"
       version = "~> 1.0"
@@ -48,17 +44,4 @@ provider "aws" {
 
 provider "cloudflare" {}
 
-provider "github" {
-  owner = var.github_owner
-  app_auth {
-    id              = data.sops_file.ci.data["github_app_id"]
-    installation_id = data.sops_file.ci.data["github_app_installation_id"]
-    pem_file        = data.sops_file.ci.data["github_app_private_key"]
-  }
-}
-
 provider "sops" {}
-
-data "sops_file" "ci" {
-  source_file = "${path.module}/../secrets/ci.yaml"
-}

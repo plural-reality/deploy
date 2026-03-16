@@ -1,6 +1,7 @@
 # Polling-based self-deploy
-# EC2 polls the deploy repo for changes via systemd timer,
-# pulls via GitHub App installation tokens, and applies via nixos-rebuild switch.
+# EC2 polls the deploy repo (public, HTTPS) for changes via systemd timer,
+# pulls updates, and applies via nixos-rebuild switch.
+# SSH deploy key is only needed for nixos-rebuild to fetch private app flake input.
 {
   config,
   lib,
@@ -12,57 +13,10 @@ let
   cfg = config.sonar.deploy;
   repoDir = "/var/lib/sonar-deploy/repo";
   git = "${pkgs.git}/bin/git";
+  sshKeyPath = "/run/secrets/deploy-ssh-key";
 
-  # Generate a short-lived GitHub App installation token from SOPS credentials.
-  # Outputs the token to stdout. Used by both git operations and nix flake fetching.
-  generateGitHubToken = pkgs.writeShellScript "generate-github-token" ''
-    set -euo pipefail
-    b64url() {
-      ${pkgs.openssl}/bin/openssl base64 -A \
-        | ${pkgs.coreutils}/bin/tr '+/' '-_' \
-        | ${pkgs.coreutils}/bin/tr -d '='
-    }
-    APP_ID=$(${pkgs.coreutils}/bin/cat /run/secrets/github-app-id)
-    INSTALLATION_ID=$(${pkgs.coreutils}/bin/cat /run/secrets/github-app-installation-id)
-    NOW=$(${pkgs.coreutils}/bin/date +%s)
-    HEADER=$(printf '%s' '{"alg":"RS256","typ":"JWT"}' | b64url)
-    PAYLOAD=$(printf '{"iat":%s,"exp":%s,"iss":"%s"}' "$((NOW - 60))" "$((NOW + 540))" "$APP_ID" | b64url)
-    UNSIGNED="$HEADER.$PAYLOAD"
-    SIGNATURE=$(printf '%s' "$UNSIGNED" \
-      | ${pkgs.openssl}/bin/openssl dgst -binary -sha256 -sign /run/secrets/github-app-private-key \
-      | b64url)
-    JWT="$UNSIGNED.$SIGNATURE"
-    ${pkgs.curl}/bin/curl -fsSL \
-      -X POST \
-      -H "Accept: application/vnd.github+json" \
-      -H "Authorization: Bearer $JWT" \
-      -H "X-GitHub-Api-Version: 2022-11-28" \
-      "https://api.github.com/app/installations/$INSTALLATION_ID/access_tokens" \
-        | ${pkgs.jq}/bin/jq -re '.token'
-  '';
-
-  gitWithGitHubApp = pkgs.writeShellScript "git-with-github-app" ''
-    set -euo pipefail
-    GITHUB_APP_TOKEN=$(${generateGitHubToken})
-    ASKPASS=$(${pkgs.coreutils}/bin/mktemp)
-    cleanup() {
-      ${pkgs.coreutils}/bin/rm -f "$ASKPASS"
-    }
-    trap cleanup EXIT
-    ${pkgs.coreutils}/bin/cat > "$ASKPASS" <<'EOF'
-#!/bin/sh
-case "$1" in
-  *Username*) printf '%s\n' "x-access-token" ;;
-  *Password*) printf '%s\n' "$GITHUB_APP_TOKEN" ;;
-  *) exit 1 ;;
-esac
-EOF
-    ${pkgs.coreutils}/bin/chmod 700 "$ASKPASS"
-    export GITHUB_APP_TOKEN
-    export GIT_ASKPASS="$ASKPASS"
-    export GIT_TERMINAL_PROMPT=0
-    exec "$@"
-  '';
+  # SSH only for nix flake fetch of private app repo
+  gitSshCommand = "${pkgs.openssh}/bin/ssh -i ${sshKeyPath} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null";
 
   overrideFlags = lib.concatStringsSep " " (
     lib.mapAttrsToList (name: url: ''--override-input ${name} "${url}"'') cfg.appInputs
@@ -81,24 +35,19 @@ EOF
       ${git} remote set-url origin "${cfg.repoUrl}"
     fi
 
-    ${gitWithGitHubApp} ${git} fetch origin
-
+    ${git} fetch origin
     ${git} checkout "${cfg.trackBranch}"
-    ${gitWithGitHubApp} ${git} pull origin "${cfg.trackBranch}" --ff-only
+    ${git} pull origin "${cfg.trackBranch}" --ff-only
 
     # Record current generation for rollback
     PREV_SYSTEM=$(readlink /run/current-system)
     echo "=== Previous generation: $PREV_SYSTEM ==="
 
-    echo "=== Generating GitHub App token for nix ==="
-    NIX_GITHUB_TOKEN=$(${generateGitHubToken})
-    NIX_ACCESS="--option access-tokens github.com=$NIX_GITHUB_TOKEN"
-
     echo "=== Building NixOS configuration: ${cfg.nodeName} ==="
-    /run/current-system/sw/bin/nixos-rebuild switch \
-      --flake "${repoDir}#${cfg.nodeName}" \
-      ${overrideFlags} \
-      $NIX_ACCESS
+    GIT_SSH_COMMAND="${gitSshCommand}" \
+      /run/current-system/sw/bin/nixos-rebuild switch \
+        --flake "${repoDir}#${cfg.nodeName}" \
+        ${overrideFlags}
 
     echo "=== Restarting Supabase ==="
     ${pkgs.systemd}/bin/systemctl restart supabase.service
@@ -120,7 +69,7 @@ EOF
     set -euo pipefail
     cd "${repoDir}"
 
-    ${gitWithGitHubApp} ${git} fetch origin
+    ${git} fetch origin
 
     LOCAL=$(${git} rev-parse HEAD)
     REMOTE=$(${git} rev-parse "origin/${cfg.trackBranch}")
@@ -150,14 +99,16 @@ in
     repoUrl = lib.mkOption {
       type = lib.types.str;
       default = "https://github.com/plural-reality/deploy.git";
-      description = "Git repository HTTPS URL";
+      description = "Git repository URL (public, no auth needed)";
     };
 
     appInputs = lib.mkOption {
       type = lib.types.attrsOf lib.types.str;
       default = { };
       description = "Flake inputs to override with latest (input name -> flake URL)";
-      example = { sonar = "github:plural-reality/baisoku-survey"; };
+      example = {
+        sonar = "git+ssh://git@github.com/plural-reality/baisoku-survey";
+      };
     };
 
     pollInterval = lib.mkOption {
@@ -188,7 +139,7 @@ in
             exit 0
           fi
           ${pkgs.coreutils}/bin/mkdir -p "$(dirname "${repoDir}")"
-          ${gitWithGitHubApp} ${git} clone "${cfg.repoUrl}" "${repoDir}"
+          ${git} clone "${cfg.repoUrl}" "${repoDir}"
           echo "Repo cloned to ${repoDir}"
         '';
       };

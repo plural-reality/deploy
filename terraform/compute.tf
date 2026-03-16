@@ -37,8 +37,12 @@ resource "aws_instance" "app" {
     volume_type = "gp3"
   }
 
+  user_data = file("${path.module}/bootstrap.sh")
+  user_data_replace_on_change = false
+
   metadata_options {
-    http_tokens = "required"
+    http_tokens                 = "required"
+    instance_metadata_tags      = "enabled"
   }
 
   tags = {
@@ -46,7 +50,7 @@ resource "aws_instance" "app" {
   }
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, user_data]
   }
 }
 

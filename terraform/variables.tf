@@ -40,18 +40,6 @@ variable "domain_name" {
   default     = "plural-reality.com"
 }
 
-variable "github_owner" {
-  description = "GitHub organization or user"
-  type        = string
-  default     = "plural-reality"
-}
-
-variable "github_repository" {
-  description = "GitHub repository name"
-  type        = string
-  default     = "baisoku-survey"
-}
-
 variable "kms_key_arn" {
   description = "KMS key ARN for SOPS (created in tfc-bootstrap)"
   type        = string

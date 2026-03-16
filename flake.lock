@@ -916,15 +916,17 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1773493672,
-        "narHash": "sha256-h3iB+u+f9M/diLjgWb5QbxxvzePVHHfIMEvaQ7IPTsg=",
-        "path": "/Users/yui/Developer/plural-reality/baisoku-survey",
-        "type": "path"
+        "lastModified": 1773579195,
+        "narHash": "sha256-yJDd2w7PDcZptahNx0YKBpqwlGkUmftfEf5+KToaih4=",
+        "ref": "refs/heads/main",
+        "rev": "4a75f2140341363e3e8341829ee606a726def420",
+        "revCount": 260,
+        "type": "git",
+        "url": "ssh://git@github.com/plural-reality/baisoku-survey"
       },
       "original": {
-        "owner": "plural-reality",
-        "repo": "baisoku-survey",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/plural-reality/baisoku-survey"
       }
     },
     "sops-nix": {

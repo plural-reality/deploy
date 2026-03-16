@@ -9,7 +9,7 @@
     };
     # App repo provides packages.sonar — the production Next.js build artifact.
     # Don't follows nixpkgs: let app use its own pin for build reproducibility.
-    sonar.url = "github:plural-reality/baisoku-survey";
+    sonar.url = "git+ssh://git@github.com/plural-reality/baisoku-survey";
   };
 
   outputs =
@@ -60,7 +60,7 @@
                   nodeName = hostname;
                   inherit trackBranch;
                   appInputs = {
-                    sonar = "github:plural-reality/baisoku-survey";
+                    sonar = "git+ssh://git@github.com/plural-reality/baisoku-survey";
                   };
                 };
               };
