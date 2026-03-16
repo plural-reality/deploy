@@ -1,5 +1,5 @@
 {
-  description = "Sonar deployment — NixOS configurations for stg/prd EC2 instances";
+  description = "Plural Reality deployment — NixOS + customer EC2 configurations";
 
   inputs = {
     nixpkgs.url = "github:numtide/nixpkgs-unfree?ref=nixos-unstable";
@@ -21,23 +21,9 @@
     let
       system = "aarch64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      mkNixOSNode = import ./lib/mkNixOSNode.nix { inherit nixpkgs sops-nix self system; };
+      mkCustomerPackage = import ./lib/mkCustomerPackage.nix { inherit pkgs; };
 
-      # Generic NixOS node builder — no app knowledge.
-      mkNixOSNode =
-        { hostname, modules ? [] }:
-        nixpkgs.lib.nixosSystem {
-          inherit system;
-          modules = [
-            sops-nix.nixosModules.sops
-            ./nixos/infrastructure.nix
-            {
-              networking.hostName = hostname;
-              system.configurationRevision = self.rev or self.dirtyRev or "dirty";
-            }
-          ] ++ modules;
-        };
-
-      # Per-environment data for Sonar NixOS nodes.
       sonarNodes = {
         # sonar-prod = {
         #   environment = "prod";
@@ -50,38 +36,9 @@
           supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
         };
       };
-
-      # Customer (non-NixOS) EC2: sonar wrapped with sops exec-env.
-      # Encrypted secrets live in nix store; decrypted in-memory at runtime via IAM/KMS.
-      mkCustomerPackage =
-        {
-          name,
-          secretsFile,
-        }:
-        let
-          sonarPkg = sonar.packages.${system}.sonar;
-        in
-        pkgs.writeShellApplication {
-          name = "sonar-${name}";
-          runtimeInputs = [
-            pkgs.sops
-            pkgs.nodejs_22
-          ];
-          text = ''
-            export NODE_ENV=production
-            export PORT=''${PORT:-3000}
-            export HOSTNAME=''${HOSTNAME:-0.0.0.0}
-            exec sops exec-env ${secretsFile} "node ${sonarPkg}/app/server.js"
-          '';
-        };
-      devSystems = [
-        "aarch64-darwin"
-        "x86_64-darwin"
-        "aarch64-linux"
-        "x86_64-linux"
-      ];
     in
     {
+      # --- NixOS Nodes ---
       nixosConfigurations = builtins.mapAttrs (
         hostname: cfg:
         mkNixOSNode {
@@ -102,9 +59,11 @@
         }
       ) sonarNodes;
 
+      # --- Customer (non-NixOS) Packages ---
       packages.${system} = {
         cybozu-prd = mkCustomerPackage {
           name = "cybozu-prd";
+          sonarPkg = sonar.packages.${system}.sonar;
           secretsFile = ./secrets/cybozu-prd.yaml;
         };
       };
@@ -112,6 +71,7 @@
       # Lightweight metadata for tooling — evaluates without building NixOS configs.
       meta.nodes = builtins.mapAttrs (_: cfg: { inherit (cfg) domain; }) sonarNodes;
 
+      # --- Dev Shells ---
       devShells = builtins.listToAttrs (
         builtins.map (s: {
           name = s;
@@ -131,7 +91,12 @@
                 echo "deploy devshell — terraform sops awscli2 jq curl"
               '';
             };
-        }) devSystems
+        }) [
+          "aarch64-darwin"
+          "x86_64-darwin"
+          "aarch64-linux"
+          "x86_64-linux"
+        ]
       );
     };
 }
