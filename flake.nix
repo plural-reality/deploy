@@ -37,9 +37,6 @@
           specialArgs = {
             sonar-app = sonar.packages.${system}.sonar;
             inherit (sonar) envContract;
-            inputRevisions = builtins.mapAttrs (_: i: i.rev or i.dirtyRev or "unknown") {
-              inherit sonar nixpkgs sops-nix;
-            };
           };
           modules = [
             sops-nix.nixosModules.sops
