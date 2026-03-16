@@ -1,2 +1,3 @@
-# Webhook resources removed — replaced by polling-based self-deploy (nixos/deploy.nix).
-# State cleaned: webhook resources and data.sops_file.ci removed via `terraform state rm`.
+# GitHub deploy keys are registered manually via the GitHub UI.
+# To get the public key: sops exec-file secrets/ssh/deploy.yaml 'ssh-keygen -y -f {}'
+# Register on: plural-reality/deploy, plural-reality/baisoku-survey

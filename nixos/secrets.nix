@@ -38,13 +38,19 @@ in
       "resend_api_key" = { };
     };
 
-    # Self-deploy SSH key (from secrets/ssh/deploy.yaml)
-    secrets."deploy_ssh_key" = {
+    # Self-deploy SSH keys — one per repo (GitHub deploy key limitation)
+    # Both keys live in secrets/ssh/deploy.yaml under "deploy" and "sonar" fields.
+    secrets."deploy_ssh_key_infra" = {
       sopsFile = ../secrets/ssh/deploy.yaml;
-      key = "data";
+      key = "deploy";
       owner = "root";
       mode = "0400";
-      path = "/run/secrets/deploy-ssh-key";
+    };
+    secrets."deploy_ssh_key_app" = {
+      sopsFile = ../secrets/ssh/deploy.yaml;
+      key = "sonar";
+      owner = "root";
+      mode = "0400";
     };
 
     # --- Rendered templates ---

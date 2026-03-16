@@ -111,7 +111,7 @@ resource "aws_ssm_parameter" "deploy_ssh_key" {
   name   = "/${local.name_prefix}/deploy-ssh-key"
   type   = "SecureString"
   key_id = var.kms_key_arn
-  value  = data.sops_file.deploy_key.data["data"]
+  value  = data.sops_file.deploy_key.data["sonar"]
 
   tags = {
     Name = "${local.name_prefix}-deploy-ssh-key"
