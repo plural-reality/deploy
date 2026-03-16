@@ -1,11 +1,14 @@
 # Per-app builder for Sonar NixOS nodes.
-# Encapsulates all Sonar-specific wiring: modules, package, deploy, supabase.
+# Signature: hostname -> { domain, supabaseDomain } -> nixosSystem
+# environment is derived from hostname by stripping "sonar-" prefix.
 {
   mkNixOSNode,
   sonarPackage,
-  sonarInputUrl,
+  sonarUrl,
+  lib,
 }:
-{ hostname, environment, domain, supabaseDomain }:
+hostname:
+{ domain, supabaseDomain }:
 mkNixOSNode {
   inherit hostname;
   modules = [
@@ -13,10 +16,10 @@ mkNixOSNode {
     {
       sonar = {
         package = sonarPackage;
-        inputUrl = sonarInputUrl;
+        inputUrl = sonarUrl;
         supabaseSource = ../supabase;
         inherit domain supabaseDomain;
-        secretsEnvironment = environment;
+        secretsEnvironment = lib.removePrefix "sonar-" hostname;
         deploy.enable = true;
       };
     }

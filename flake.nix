@@ -25,8 +25,10 @@
       mkNixOSNode = import ./lib/mkNixOSNode.nix { inherit nixpkgs sops-nix self system; };
       mkSonarNode = import ./lib/mkSonarNode.nix {
         inherit mkNixOSNode;
+        inherit (nixpkgs) lib;
         sonarPackage = sonar.packages.${system}.sonar;
-        sonarInputUrl = sonar.url;
+        # duplicated with inputs.sonar.url — flake protocol doesn't expose input URLs
+        sonarUrl = "git+ssh://git@github.com/plural-reality/baisoku-survey";
       };
       mkCustomerPackage = import ./lib/mkCustomerPackage.nix {
         pkgs = nixpkgs.legacyPackages.${system};
@@ -34,16 +36,12 @@
     in
     {
       # --- NixOS Nodes ---
-      nixosConfigurations = {
-        sonar-staging = mkSonarNode {
-          hostname = "sonar-staging";
-          environment = "staging";
+      nixosConfigurations = builtins.mapAttrs mkSonarNode {
+        sonar-staging = {
           domain = "staging.baisoku-survey.plural-reality.com";
           supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
         };
-        # sonar-prod = mkSonarNode {
-        #   hostname = "sonar-prod";
-        #   environment = "prod";
+        # sonar-prod = {
         #   domain = "app.baisoku-survey.plural-reality.com";
         #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
         # };
