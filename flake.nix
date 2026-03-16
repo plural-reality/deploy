@@ -89,13 +89,13 @@
           '';
         };
       nodeDefinitions = {
-        sonar-prod = {
-          hostname = "sonar-prod";
-          environment = "prod";
-          domain = "app.baisoku-survey.plural-reality.com";
-          supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-          trackBranch = "main";
-        };
+        # sonar-prod = {
+        #   hostname = "sonar-prod";
+        #   environment = "prod";
+        #   domain = "app.baisoku-survey.plural-reality.com";
+        #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
+        #   trackBranch = "main";
+        # };
         sonar-staging = {
           hostname = "sonar-staging";
           environment = "staging";
