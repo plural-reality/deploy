@@ -106,6 +106,12 @@
           supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
         };
       };
+      devSystems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
     in
     {
       nixosConfigurations = builtins.mapAttrs (_: cfg: mkNode cfg) nodeDefinitions;
@@ -119,5 +125,27 @@
 
       # Lightweight metadata for tooling — evaluates without building NixOS configs.
       meta.nodes = builtins.mapAttrs (_: cfg: { inherit (cfg) domain; }) nodeDefinitions;
+
+      devShells = builtins.listToAttrs (
+        builtins.map (s: {
+          name = s;
+          value.default =
+            let
+              p = nixpkgs.legacyPackages.${s};
+            in
+            p.mkShell {
+              packages = [
+                p.terraform
+                p.sops
+                p.awscli2
+                p.jq
+                p.curl
+              ];
+              shellHook = ''
+                echo "deploy devshell — terraform sops awscli2 jq curl"
+              '';
+            };
+        }) devSystems
+      );
     };
 }

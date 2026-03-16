@@ -10,3 +10,4 @@ tfc-bootstrap/terraform.tfstate.backup
 # Nix
 result
 result-*
+.direnv

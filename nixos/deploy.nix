@@ -1,7 +1,7 @@
 # Polling-based self-deploy
-# EC2 polls the deploy repo (public, HTTPS) for changes via systemd timer,
-# pulls updates, and applies via nixos-rebuild switch.
-# SSH deploy key is only needed for nixos-rebuild to fetch private app flake input.
+# EC2 polls the deploy repo (HTTPS) and app flake inputs (SSH) for changes
+# via systemd timer. On change, pulls updates and applies via nixos-rebuild switch.
+# SSH deploy key is used for both ls-remote checks and nixos-rebuild --override-input.
 {
   config,
   lib,
@@ -65,18 +65,36 @@ let
     echo "=== Deploy complete at $(date -Iseconds). Smoke test passed. ==="
   '';
 
+  # Exits 0 if any appInputs flake input has a newer commit than what's deployed.
+  # Compares git ls-remote HEAD against inputRevisions in /etc/nixos-version.json.
+  checkInputsScript = pkgs.writeShellScript "check-app-inputs" ''
+    set -euo pipefail
+    export GIT_SSH_COMMAND="${gitSshCommand}"
+    ${lib.concatStrings (lib.mapAttrsToList (name: url:
+      let gitUrl = lib.removePrefix "git+" url; in ''
+    REMOTE=$(${git} ls-remote "${gitUrl}" HEAD 2>/dev/null | ${pkgs.coreutils}/bin/cut -f1 || echo "unknown")
+    DEPLOYED=$(${pkgs.jq}/bin/jq -r '.inputs.${name} // "unknown"' /etc/nixos-version.json 2>/dev/null || echo "unknown")
+    [ "$REMOTE" = "unknown" ] || [ "$REMOTE" = "$DEPLOYED" ] || { echo "${name}: $DEPLOYED -> $REMOTE"; exit 0; }
+    '') cfg.appInputs)}
+    exit 1
+  '';
+
   pollScript = pkgs.writeShellScript "deploy-poll" ''
     set -euo pipefail
     cd "${repoDir}"
 
-    ${git} fetch origin
+    CHANGED=false
 
+    # Check deploy repo for new commits
+    ${git} fetch origin
     LOCAL=$(${git} rev-parse HEAD)
     REMOTE=$(${git} rev-parse "origin/${cfg.trackBranch}")
+    [ "$LOCAL" = "$REMOTE" ] || { echo "Deploy repo changed: $LOCAL -> $REMOTE"; CHANGED=true; }
 
-    [ "$LOCAL" != "$REMOTE" ] || { echo "No changes on ${cfg.trackBranch} ($LOCAL)"; exit 0; }
+    # Check app flake inputs for new commits
+    ${checkInputsScript} && { echo "App input changed"; CHANGED=true; } || true
 
-    echo "Change detected: $LOCAL -> $REMOTE"
+    $CHANGED || { echo "No changes (deploy: $LOCAL, inputs: current)"; exit 0; }
     exec ${deployScript}
   '';
 in

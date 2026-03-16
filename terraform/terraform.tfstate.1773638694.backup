@@ -1,0 +1,1697 @@
+{
+  "version": 4,
+  "terraform_version": "1.14.6",
+  "serial": 50,
+  "lineage": "ef98575c-585c-d3bd-cee1-a1c89fd9ac72",
+  "outputs": {
+    "domain": {
+      "value": {
+        "prod": "app.baisoku-survey.plural-reality.com",
+        "staging": "staging.baisoku-survey.plural-reality.com"
+      },
+      "type": [
+        "object",
+        {
+          "prod": "string",
+          "staging": "string"
+        }
+      ]
+    },
+    "domain_url": {
+      "value": {
+        "prod": "https://app.baisoku-survey.plural-reality.com/",
+        "staging": "https://staging.baisoku-survey.plural-reality.com/"
+      },
+      "type": [
+        "object",
+        {
+          "prod": "string",
+          "staging": "string"
+        }
+      ]
+    },
+    "instance_public_ip": {
+      "value": {
+        "prod": "35.75.70.91",
+        "staging": "18.178.160.195"
+      },
+      "type": [
+        "object",
+        {
+          "prod": "string",
+          "staging": "string"
+        }
+      ]
+    },
+    "kms_key_arn": {
+      "value": "arn:aws:kms:ap-northeast-1:377786476154:key/74beb9ae-57b3-4789-b41c-588fca1d960e",
+      "type": "string"
+    },
+    "ssh_command": {
+      "value": {
+        "prod": "ssh root@35.75.70.91",
+        "staging": "ssh root@18.178.160.195"
+      },
+      "type": [
+        "object",
+        {
+          "prod": "string",
+          "staging": "string"
+        }
+      ]
+    },
+    "supabase_domain": {
+      "value": {
+        "prod": "supabase.baisoku-survey.plural-reality.com",
+        "staging": "staging-supabase.baisoku-survey.plural-reality.com"
+      },
+      "type": [
+        "object",
+        {
+          "prod": "string",
+          "staging": "string"
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "mode": "data",
+      "type": "aws_ami",
+      "name": "nixos",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "architecture": "arm64",
+            "arn": "arn:aws:ec2:ap-northeast-1::image/ami-0e5a02514d547ce23",
+            "block_device_mappings": [
+              {
+                "device_name": "/dev/xvda",
+                "ebs": {
+                  "delete_on_termination": "true",
+                  "encrypted": "false",
+                  "iops": "0",
+                  "snapshot_id": "snap-05132e3078b4a0e9f",
+                  "throughput": "0",
+                  "volume_initialization_rate": "0",
+                  "volume_size": "5",
+                  "volume_type": "gp3"
+                },
+                "no_device": "",
+                "virtual_name": ""
+              }
+            ],
+            "boot_mode": "uefi",
+            "creation_date": "2026-03-15T00:25:40.000Z",
+            "deprecation_time": "2026-06-13T00:32:00.000Z",
+            "description": "",
+            "ena_support": true,
+            "executable_users": null,
+            "filter": [
+              {
+                "name": "name",
+                "values": [
+                  "nixos/25.11*-aarch64-linux"
+                ]
+              },
+              {
+                "name": "virtualization-type",
+                "values": [
+                  "hvm"
+                ]
+              }
+            ],
+            "hypervisor": "xen",
+            "id": "ami-0e5a02514d547ce23",
+            "image_id": "ami-0e5a02514d547ce23",
+            "image_location": "427812963091/nixos/25.11.6913.fabb8c9deee2-aarch64-linux",
+            "image_owner_alias": "",
+            "image_type": "machine",
+            "imds_support": "v2.0",
+            "include_deprecated": false,
+            "kernel_id": "",
+            "last_launched_time": "",
+            "most_recent": true,
+            "name": "nixos/25.11.6913.fabb8c9deee2-aarch64-linux",
+            "name_regex": null,
+            "owner_id": "427812963091",
+            "owners": [
+              "427812963091"
+            ],
+            "platform": "",
+            "platform_details": "Linux/UNIX",
+            "product_codes": [],
+            "public": true,
+            "ramdisk_id": "",
+            "root_device_name": "/dev/xvda",
+            "root_device_type": "ebs",
+            "root_snapshot_id": "snap-05132e3078b4a0e9f",
+            "sriov_net_support": "simple",
+            "state": "available",
+            "state_reason": {
+              "code": "UNSET",
+              "message": "UNSET"
+            },
+            "tags": {},
+            "timeouts": null,
+            "tpm_support": "",
+            "uefi_data": null,
+            "usage_operation": "RunInstances",
+            "virtualization_type": "hvm"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "data",
+      "type": "sops_file",
+      "name": "ci",
+      "provider": "provider[\"registry.terraform.io/carlpett/sops\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "data": {
+              "cachix_auth_token": "eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0OWI2NTYxNy1iM2JmLTQwYTktYjU3Mi0zYWZmMjY2Y2I0NzMiLCJzY29wZXMiOiJ0eCJ9.FrC0o6IUGgiwd0VSjJmoj12fDPW9aarMOutJBRSYeMw",
+              "github_app_id": "3012900",
+              "github_app_installation_id": "114149246",
+              "github_app_private_key": "-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAwzk9r3ZSKXfHBFfFHTWVManvvMMC67LXnGdpuXg9NS+Y9exF\nQbVN/7oEAl13n3XrbX52q/bp4S5JdEeLH3DO2y/ezNsd375AqexOeFHRJhAQPwta\nG5vQdqTyrfw2RsFoA8QbwQyGhhPMVSWi7CdkuxKsmurgo6pUqoBb4DZuBCD4EI4F\n2FeHYi1+cIta/ZbMmb/knxjBmv3ZNGPQhCddsBZDSl2B1wkcisPRQtiTTA/h2/Cj\nYsy1u7fw8hAthMjIj0I1BI89bIIlh/aeXxYOJpucD4yzPlKzvX5IzGLoXHHpeQj2\nCWct8PMWojTmNDn9eV0vd0lrMxZPBViagQJrrwIDAQABAoIBADojSNCBHxTEW9ta\nPBRnyaeBoSiItsz0dKtaTKz0Nt4o75eFJlbcJH9cqSb/KMmvN05jU/oATURHIY7k\nY3UYhjHWPrapJmtkYCN6gR/p1axNKllsCwifzWQX2UGhE5Tcsho1A8Lo9QLm0Hom\n/C7xyFjBxe9YtU9oQVCJa1MJQpgtp+DSJvmLY5O4F1fwwuYeVAzkFYc8PrAV63SV\nsH9ZL52Kfx31uQ2q/KlfZCkCW+m8J1QS7kLF+ilrSFDCMlOO8pG65kSxtCO5qEQz\nNQlQb3huzZwRdxxQjJzchA45E0ycA0x+V3gqVk+yRBAcNTLXHwLSEBb/neT4sMkS\nyhGWiAECgYEA7tWMkQOuiWiIDdHfgdaz4kbshFXgrhsDB55524/ZnpUPbAAf2LhH\n7b4ll3RdI4xHLuyu93dIGfwv5S0B19d82tFpiTcfiqeUuFefyKqJDfG+Abpy7G9B\ns4Iwhv4wLJhIyNJ6jgD85Y53cJvK1fDykA74gs4IrDuoKlXHKvKzDAECgYEA0UFG\nbVGbD3wSFdaWMc9KJGAf1AmNn+/U5BmQpMi743SqToCZTqzE9MQXavMpuFYMf6vY\nlrbMb8nmpclMkpgszQhX7hY8GWBI/qs1/L8/dRDHHsLSTQx7zHD2d04+C9/fTrx+\nAsp+UaULBJrrOGZFNm5NFBy/+uOrMSMAUrUJN68CgYEAw0gU4VWTVoMEC9i42d8F\nwlSfey0EwxcPCSHJHX+nPoU+0N3hLECxf3DkJ8xbg39ljLa18V20tJqBRu/f++4U\nBo8HrcxGnAaeEYSD/32BBsfMxnj/Etd9bxtaNmaMWUpC6QFAd+/S2Jf+jTK1TOzw\nSF4VUE7KxJkazVLJwRIk2AECgYB7+Msruvw9uUjRrVdAXUnUsSpKKfrA9YrQNKEw\nL0i5YgYACkpJhSwOwxoIn9Vow3oWLY5dBCGsXRaLw+3cr9FjC31krcGfWx8D2hVb\nD0ceKPl/LPcA9NNndMlgN3ek+1ZGRH/3UVZzMm+Lo+iVemmo7MI3lyzaDAYBT3ZC\nicTTOwKBgCia/D3HSmUGqP0NHcLCkUfYIGBMh29g8czKJ924qzXvZvR5qTqNvxT3\nZRYXYv3BT+tkO1mKn9kHkdCRU23hFHBK6MuccmqNOT2bmd62KUBdRjYkLBN1YPu8\n1BIDnWB+AiFnH6T3hhuBvmH3HES2pw0cV9HDpOxE+Jy2S+YkSAYz\n-----END RSA PRIVATE KEY-----\n",
+              "github_deploy_key": "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\nQyNTUxOQAAACB1RC25o4MlF1TXPzC+l63uPIoiyf0ebD6gMMMW1OjYqwAAAJifVXjbn1V4\n2wAAAAtzc2gtZWQyNTUxOQAAACB1RC25o4MlF1TXPzC+l63uPIoiyf0ebD6gMMMW1OjYqw\nAAAEAJBC33SEzRC9UqSJ75jzJyTl3N/ZD2mtI7ljqSmtgfM3VELbmjgyUXVNc/ML6Xre48\niiLJ/R5sPqAwwxbU6NirAAAAE3NvbmFyLWdpdGh1Yi1kZXBsb3kBAg==\n-----END OPENSSH PRIVATE KEY-----\n",
+              "webhook_secret": "1c103496f16a3278f3303d670ed17957e282a90f9b355623925724def726098d"
+            },
+            "id": "-",
+            "input_type": null,
+            "raw": "github_deploy_key: |\n    -----BEGIN OPENSSH PRIVATE KEY-----\n    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW\n    QyNTUxOQAAACB1RC25o4MlF1TXPzC+l63uPIoiyf0ebD6gMMMW1OjYqwAAAJifVXjbn1V4\n    2wAAAAtzc2gtZWQyNTUxOQAAACB1RC25o4MlF1TXPzC+l63uPIoiyf0ebD6gMMMW1OjYqw\n    AAAEAJBC33SEzRC9UqSJ75jzJyTl3N/ZD2mtI7ljqSmtgfM3VELbmjgyUXVNc/ML6Xre48\n    iiLJ/R5sPqAwwxbU6NirAAAAE3NvbmFyLWdpdGh1Yi1kZXBsb3kBAg==\n    -----END OPENSSH PRIVATE KEY-----\nwebhook_secret: 1c103496f16a3278f3303d670ed17957e282a90f9b355623925724def726098d\ngithub_app_id: \"3012900\"\ngithub_app_installation_id: \"114149246\"\ngithub_app_private_key: |\n    -----BEGIN RSA PRIVATE KEY-----\n    MIIEowIBAAKCAQEAwzk9r3ZSKXfHBFfFHTWVManvvMMC67LXnGdpuXg9NS+Y9exF\n    QbVN/7oEAl13n3XrbX52q/bp4S5JdEeLH3DO2y/ezNsd375AqexOeFHRJhAQPwta\n    G5vQdqTyrfw2RsFoA8QbwQyGhhPMVSWi7CdkuxKsmurgo6pUqoBb4DZuBCD4EI4F\n    2FeHYi1+cIta/ZbMmb/knxjBmv3ZNGPQhCddsBZDSl2B1wkcisPRQtiTTA/h2/Cj\n    Ysy1u7fw8hAthMjIj0I1BI89bIIlh/aeXxYOJpucD4yzPlKzvX5IzGLoXHHpeQj2\n    CWct8PMWojTmNDn9eV0vd0lrMxZPBViagQJrrwIDAQABAoIBADojSNCBHxTEW9ta\n    PBRnyaeBoSiItsz0dKtaTKz0Nt4o75eFJlbcJH9cqSb/KMmvN05jU/oATURHIY7k\n    Y3UYhjHWPrapJmtkYCN6gR/p1axNKllsCwifzWQX2UGhE5Tcsho1A8Lo9QLm0Hom\n    /C7xyFjBxe9YtU9oQVCJa1MJQpgtp+DSJvmLY5O4F1fwwuYeVAzkFYc8PrAV63SV\n    sH9ZL52Kfx31uQ2q/KlfZCkCW+m8J1QS7kLF+ilrSFDCMlOO8pG65kSxtCO5qEQz\n    NQlQb3huzZwRdxxQjJzchA45E0ycA0x+V3gqVk+yRBAcNTLXHwLSEBb/neT4sMkS\n    yhGWiAECgYEA7tWMkQOuiWiIDdHfgdaz4kbshFXgrhsDB55524/ZnpUPbAAf2LhH\n    7b4ll3RdI4xHLuyu93dIGfwv5S0B19d82tFpiTcfiqeUuFefyKqJDfG+Abpy7G9B\n    s4Iwhv4wLJhIyNJ6jgD85Y53cJvK1fDykA74gs4IrDuoKlXHKvKzDAECgYEA0UFG\n    bVGbD3wSFdaWMc9KJGAf1AmNn+/U5BmQpMi743SqToCZTqzE9MQXavMpuFYMf6vY\n    lrbMb8nmpclMkpgszQhX7hY8GWBI/qs1/L8/dRDHHsLSTQx7zHD2d04+C9/fTrx+\n    Asp+UaULBJrrOGZFNm5NFBy/+uOrMSMAUrUJN68CgYEAw0gU4VWTVoMEC9i42d8F\n    wlSfey0EwxcPCSHJHX+nPoU+0N3hLECxf3DkJ8xbg39ljLa18V20tJqBRu/f++4U\n    Bo8HrcxGnAaeEYSD/32BBsfMxnj/Etd9bxtaNmaMWUpC6QFAd+/S2Jf+jTK1TOzw\n    SF4VUE7KxJkazVLJwRIk2AECgYB7+Msruvw9uUjRrVdAXUnUsSpKKfrA9YrQNKEw\n    L0i5YgYACkpJhSwOwxoIn9Vow3oWLY5dBCGsXRaLw+3cr9FjC31krcGfWx8D2hVb\n    D0ceKPl/LPcA9NNndMlgN3ek+1ZGRH/3UVZzMm+Lo+iVemmo7MI3lyzaDAYBT3ZC\n    icTTOwKBgCia/D3HSmUGqP0NHcLCkUfYIGBMh29g8czKJ924qzXvZvR5qTqNvxT3\n    ZRYXYv3BT+tkO1mKn9kHkdCRU23hFHBK6MuccmqNOT2bmd62KUBdRjYkLBN1YPu8\n    1BIDnWB+AiFnH6T3hhuBvmH3HES2pw0cV9HDpOxE+Jy2S+YkSAYz\n    -----END RSA PRIVATE KEY-----\ncachix_auth_token: eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiI0OWI2NTYxNy1iM2JmLTQwYTktYjU3Mi0zYWZmMjY2Y2I0NzMiLCJzY29wZXMiOiJ0eCJ9.FrC0o6IUGgiwd0VSjJmoj12fDPW9aarMOutJBRSYeMw\n",
+            "source_file": "./../../secrets/ci.yaml"
+          },
+          "sensitive_attributes": [
+            [
+              {
+                "type": "get_attr",
+                "value": "data"
+              }
+            ],
+            [
+              {
+                "type": "get_attr",
+                "value": "raw"
+              }
+            ]
+          ],
+          "identity_schema_version": 0
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_backup_plan",
+      "name": "daily",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "advanced_backup_setting": [],
+            "arn": "arn:aws:backup:ap-northeast-1:377786476154:backup-plan:3094cc2d-e132-40d8-8542-d37069c468c8",
+            "id": "3094cc2d-e132-40d8-8542-d37069c468c8",
+            "name": "sonar-daily",
+            "rule": [
+              {
+                "completion_window": 180,
+                "copy_action": [],
+                "enable_continuous_backup": false,
+                "lifecycle": [
+                  {
+                    "cold_storage_after": 0,
+                    "delete_after": 14,
+                    "opt_in_to_archive_for_supported_resources": false
+                  }
+                ],
+                "recovery_point_tags": {},
+                "rule_name": "daily-snapshot",
+                "schedule": "cron(0 3 * * ? *)",
+                "schedule_expression_timezone": "Etc/UTC",
+                "start_window": 60,
+                "target_vault_name": "sonar-backup"
+              }
+            ],
+            "tags": {
+              "Name": "sonar-backup-plan"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-backup-plan",
+              "Project": "sonar"
+            },
+            "version": "YTAxNjgzYzItNjZiMC00NzM3LThlNzMtNmZiZmFlNzA5MGU3"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "dependencies": [
+            "aws_backup_vault.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_backup_selection",
+      "name": "ec2",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "condition": [
+              {
+                "string_equals": [],
+                "string_like": [],
+                "string_not_equals": [],
+                "string_not_like": []
+              }
+            ],
+            "iam_role_arn": "arn:aws:iam::377786476154:role/sonar-backup",
+            "id": "5f8c3e1a-9409-4afc-8b49-c0150ffa1c7b",
+            "name": "sonar-ec2",
+            "not_resources": [],
+            "plan_id": "3094cc2d-e132-40d8-8542-d37069c468c8",
+            "resources": [],
+            "selection_tag": [
+              {
+                "key": "Project",
+                "type": "STRINGEQUALS",
+                "value": "sonar"
+              }
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_backup_plan.daily",
+            "aws_backup_vault.main",
+            "aws_iam_role.backup"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_backup_vault",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:backup:ap-northeast-1:377786476154:backup-vault:sonar-backup",
+            "force_destroy": false,
+            "id": "sonar-backup",
+            "kms_key_arn": "arn:aws:kms:ap-northeast-1:377786476154:key/1b51de81-5800-4c88-883e-a84a739f3d9b",
+            "name": "sonar-backup",
+            "recovery_points": 0,
+            "tags": {
+              "Name": "sonar-backup"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-backup",
+              "Project": "sonar"
+            },
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjo2MDAwMDAwMDAwMDB9fQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "prod",
+          "schema_version": 0,
+          "attributes": {
+            "address": null,
+            "allocation_id": "eipalloc-05b009e5c5c57ffa4",
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:elastic-ip/eipalloc-05b009e5c5c57ffa4",
+            "associate_with_private_ip": null,
+            "association_id": "eipassoc-0ab66b089f7def9f8",
+            "carrier_ip": "",
+            "customer_owned_ip": "",
+            "customer_owned_ipv4_pool": "",
+            "domain": "vpc",
+            "id": "eipalloc-05b009e5c5c57ffa4",
+            "instance": "i-0e6816a24359a3242",
+            "ipam_pool_id": null,
+            "network_border_group": "ap-northeast-1",
+            "network_interface": "eni-04fe503631ac7febd",
+            "private_dns": "ip-10-2-1-71.ap-northeast-1.compute.internal",
+            "private_ip": "10.2.1.71",
+            "ptr_record": "",
+            "public_dns": "ec2-35-75-70-91.ap-northeast-1.compute.amazonaws.com",
+            "public_ip": "35.75.70.91",
+            "public_ipv4_pool": "amazon",
+            "tags": {
+              "Name": "sonar-prod-eip"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-prod-eip",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxODAwMDAwMDAwMDAsInJlYWQiOjkwMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        },
+        {
+          "index_key": "staging",
+          "schema_version": 0,
+          "attributes": {
+            "address": null,
+            "allocation_id": "eipalloc-0dd2bc91342d0ede8",
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:elastic-ip/eipalloc-0dd2bc91342d0ede8",
+            "associate_with_private_ip": null,
+            "association_id": "eipassoc-046e070c108b7fa34",
+            "carrier_ip": "",
+            "customer_owned_ip": "",
+            "customer_owned_ipv4_pool": "",
+            "domain": "vpc",
+            "id": "eipalloc-0dd2bc91342d0ede8",
+            "instance": "i-09dc7a4cfc0f383f5",
+            "ipam_pool_id": null,
+            "network_border_group": "ap-northeast-1",
+            "network_interface": "eni-069705a49b0acd5c2",
+            "private_dns": "ip-10-2-1-209.ap-northeast-1.compute.internal",
+            "private_ip": "10.2.1.209",
+            "ptr_record": "",
+            "public_dns": "ec2-18-178-160-195.ap-northeast-1.compute.amazonaws.com",
+            "public_ip": "18.178.160.195",
+            "public_ipv4_pool": "amazon",
+            "tags": {
+              "Name": "sonar-staging-eip"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-staging-eip",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc": true
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiZGVsZXRlIjoxODAwMDAwMDAwMDAsInJlYWQiOjkwMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMDB9fQ==",
+          "dependencies": [
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_instance_profile",
+      "name": "ec2_sops",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::377786476154:instance-profile/sonar-ec2-sops",
+            "create_date": "2026-03-04T04:57:03Z",
+            "id": "sonar-ec2-sops",
+            "name": "sonar-ec2-sops",
+            "name_prefix": "",
+            "path": "/",
+            "role": "sonar-ec2-sops",
+            "tags": {
+              "Name": "sonar-ec2-sops-profile"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-ec2-sops-profile",
+              "Project": "sonar"
+            },
+            "unique_id": "AIPAVP5OUEZ5KQTALWIPE"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.ec2_sops"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "backup",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::377786476154:role/sonar-backup",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"backup.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-03-05T14:25:18Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "sonar-backup",
+            "inline_policy": [],
+            "managed_policy_arns": [
+              "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+            ],
+            "max_session_duration": 3600,
+            "name": "sonar-backup",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Project": "sonar"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "unique_id": "AROAVP5OUEZ5KWEBRR4AS"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role",
+      "name": "ec2_sops",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:iam::377786476154:role/sonar-ec2-sops",
+            "assume_role_policy": "{\"Statement\":[{\"Action\":\"sts:AssumeRole\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"ec2.amazonaws.com\"}}],\"Version\":\"2012-10-17\"}",
+            "create_date": "2026-03-04T04:57:02Z",
+            "description": "",
+            "force_detach_policies": false,
+            "id": "sonar-ec2-sops",
+            "inline_policy": [
+              {
+                "name": "sonar-kms-decrypt",
+                "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"kms:Decrypt\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:kms:ap-northeast-1:377786476154:key/74beb9ae-57b3-4789-b41c-588fca1d960e\"]}]}"
+              }
+            ],
+            "managed_policy_arns": [],
+            "max_session_duration": 3600,
+            "name": "sonar-ec2-sops",
+            "name_prefix": "",
+            "path": "/",
+            "permissions_boundary": "",
+            "tags": {
+              "Name": "sonar-ec2-sops-role"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-ec2-sops-role",
+              "Project": "sonar"
+            },
+            "unique_id": "AROAVP5OUEZ5AEBUDJPFU"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy",
+      "name": "kms_decrypt",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "sonar-ec2-sops:sonar-kms-decrypt",
+            "name": "sonar-kms-decrypt",
+            "name_prefix": "",
+            "policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"kms:Decrypt\",\"kms:DescribeKey\"],\"Effect\":\"Allow\",\"Resource\":[\"arn:aws:kms:ap-northeast-1:377786476154:key/74beb9ae-57b3-4789-b41c-588fca1d960e\"]}]}",
+            "role": "sonar-ec2-sops"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.ec2_sops"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_iam_role_policy_attachment",
+      "name": "backup",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "id": "sonar-backup-20260305142520172800000001",
+            "policy_arn": "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup",
+            "role": "sonar-backup"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "bnVsbA==",
+          "dependencies": [
+            "aws_iam_role.backup"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "index_key": "prod",
+          "schema_version": 1,
+          "attributes": {
+            "ami": "ami-0485f1d0ae7e66482",
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:instance/i-0e6816a24359a3242",
+            "associate_public_ip_address": true,
+            "availability_zone": "ap-northeast-1d",
+            "capacity_reservation_specification": [
+              {
+                "capacity_reservation_preference": "open",
+                "capacity_reservation_target": []
+              }
+            ],
+            "cpu_core_count": 2,
+            "cpu_options": [
+              {
+                "amd_sev_snp": "",
+                "core_count": 2,
+                "threads_per_core": 1
+              }
+            ],
+            "cpu_threads_per_core": 1,
+            "credit_specification": [
+              {
+                "cpu_credits": "unlimited"
+              }
+            ],
+            "disable_api_stop": false,
+            "disable_api_termination": false,
+            "ebs_block_device": [],
+            "ebs_optimized": false,
+            "enable_primary_ipv6": false,
+            "enclave_options": [
+              {
+                "enabled": false
+              }
+            ],
+            "ephemeral_block_device": [],
+            "get_password_data": false,
+            "hibernation": false,
+            "host_id": "",
+            "host_resource_group_arn": null,
+            "iam_instance_profile": "sonar-ec2-sops",
+            "id": "i-0e6816a24359a3242",
+            "instance_initiated_shutdown_behavior": "stop",
+            "instance_lifecycle": "",
+            "instance_market_options": [],
+            "instance_state": "running",
+            "instance_type": "t4g.medium",
+            "ipv6_address_count": 1,
+            "ipv6_addresses": [
+              "2406:da14:1a01:f201:2bc7:8d13:d293:da38"
+            ],
+            "key_name": "sonar-deploy",
+            "launch_template": [],
+            "maintenance_options": [
+              {
+                "auto_recovery": "default"
+              }
+            ],
+            "metadata_options": [
+              {
+                "http_endpoint": "enabled",
+                "http_protocol_ipv6": "disabled",
+                "http_put_response_hop_limit": 2,
+                "http_tokens": "required",
+                "instance_metadata_tags": "disabled"
+              }
+            ],
+            "monitoring": false,
+            "network_interface": [],
+            "outpost_arn": "",
+            "password_data": "",
+            "placement_group": "",
+            "placement_partition_number": 0,
+            "primary_network_interface_id": "eni-04fe503631ac7febd",
+            "private_dns": "ip-10-2-1-71.ap-northeast-1.compute.internal",
+            "private_dns_name_options": [
+              {
+                "enable_resource_name_dns_a_record": false,
+                "enable_resource_name_dns_aaaa_record": false,
+                "hostname_type": "ip-name"
+              }
+            ],
+            "private_ip": "10.2.1.71",
+            "public_dns": "ec2-35-75-70-91.ap-northeast-1.compute.amazonaws.com",
+            "public_ip": "35.75.70.91",
+            "root_block_device": [
+              {
+                "delete_on_termination": true,
+                "device_name": "/dev/xvda",
+                "encrypted": false,
+                "iops": 3000,
+                "kms_key_id": "",
+                "tags": {},
+                "tags_all": {
+                  "Environment": "prod",
+                  "ManagedBy": "terraform",
+                  "Project": "sonar"
+                },
+                "throughput": 125,
+                "volume_id": "vol-0cfb1f3dcf8d34cce",
+                "volume_size": 40,
+                "volume_type": "gp3"
+              }
+            ],
+            "secondary_private_ips": [],
+            "security_groups": [],
+            "source_dest_check": true,
+            "spot_instance_request_id": "",
+            "subnet_id": "subnet-0b75ce4324308522c",
+            "tags": {
+              "Name": "sonar-prod-app"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-prod-app",
+              "Project": "sonar"
+            },
+            "tenancy": "default",
+            "timeouts": null,
+            "user_data": null,
+            "user_data_base64": null,
+            "user_data_replace_on_change": false,
+            "volume_tags": null,
+            "vpc_security_group_ids": [
+              "sg-037c37a112ab38fb7"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMCwicmVhZCI6OTAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        },
+        {
+          "index_key": "staging",
+          "schema_version": 1,
+          "attributes": {
+            "ami": "ami-0e5a02514d547ce23",
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:instance/i-09dc7a4cfc0f383f5",
+            "associate_public_ip_address": true,
+            "availability_zone": "ap-northeast-1d",
+            "capacity_reservation_specification": [
+              {
+                "capacity_reservation_preference": "open",
+                "capacity_reservation_target": []
+              }
+            ],
+            "cpu_core_count": 2,
+            "cpu_options": [
+              {
+                "amd_sev_snp": "",
+                "core_count": 2,
+                "threads_per_core": 1
+              }
+            ],
+            "cpu_threads_per_core": 1,
+            "credit_specification": [
+              {
+                "cpu_credits": "unlimited"
+              }
+            ],
+            "disable_api_stop": false,
+            "disable_api_termination": false,
+            "ebs_block_device": [],
+            "ebs_optimized": false,
+            "enable_primary_ipv6": false,
+            "enclave_options": [
+              {
+                "enabled": false
+              }
+            ],
+            "ephemeral_block_device": [],
+            "get_password_data": false,
+            "hibernation": false,
+            "host_id": "",
+            "host_resource_group_arn": null,
+            "iam_instance_profile": "sonar-ec2-sops",
+            "id": "i-09dc7a4cfc0f383f5",
+            "instance_initiated_shutdown_behavior": "stop",
+            "instance_lifecycle": "",
+            "instance_market_options": [],
+            "instance_state": "running",
+            "instance_type": "t4g.medium",
+            "ipv6_address_count": 1,
+            "ipv6_addresses": [
+              "2406:da14:1a01:f201:f9ca:492c:766b:787b"
+            ],
+            "key_name": "sonar-deploy",
+            "launch_template": [],
+            "maintenance_options": [
+              {
+                "auto_recovery": "default"
+              }
+            ],
+            "metadata_options": [
+              {
+                "http_endpoint": "enabled",
+                "http_protocol_ipv6": "disabled",
+                "http_put_response_hop_limit": 2,
+                "http_tokens": "required",
+                "instance_metadata_tags": "enabled"
+              }
+            ],
+            "monitoring": false,
+            "network_interface": [],
+            "outpost_arn": "",
+            "password_data": "",
+            "placement_group": "",
+            "placement_partition_number": 0,
+            "primary_network_interface_id": "eni-069705a49b0acd5c2",
+            "private_dns": "ip-10-2-1-209.ap-northeast-1.compute.internal",
+            "private_dns_name_options": [
+              {
+                "enable_resource_name_dns_a_record": false,
+                "enable_resource_name_dns_aaaa_record": false,
+                "hostname_type": "ip-name"
+              }
+            ],
+            "private_ip": "10.2.1.209",
+            "public_dns": "ec2-13-158-70-205.ap-northeast-1.compute.amazonaws.com",
+            "public_ip": "13.158.70.205",
+            "root_block_device": [
+              {
+                "delete_on_termination": true,
+                "device_name": "/dev/xvda",
+                "encrypted": false,
+                "iops": 3000,
+                "kms_key_id": "",
+                "tags": null,
+                "tags_all": {
+                  "Environment": "prod",
+                  "ManagedBy": "terraform",
+                  "Project": "sonar"
+                },
+                "throughput": 125,
+                "volume_id": "vol-0213943929b8332d9",
+                "volume_size": 40,
+                "volume_type": "gp3"
+              }
+            ],
+            "secondary_private_ips": [],
+            "security_groups": [],
+            "source_dest_check": true,
+            "spot_instance_request_id": "",
+            "subnet_id": "subnet-0b75ce4324308522c",
+            "tags": {
+              "Name": "sonar-staging-app"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-staging-app",
+              "Project": "sonar"
+            },
+            "tenancy": "default",
+            "timeouts": null,
+            "user_data": "796f6040b6a22d86750a82b3d9bdb47836b04565",
+            "user_data_base64": null,
+            "user_data_replace_on_change": false,
+            "volume_tags": null,
+            "vpc_security_group_ids": [
+              "sg-037c37a112ab38fb7"
+            ]
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMCwicmVhZCI6OTAwMDAwMDAwMDAwLCJ1cGRhdGUiOjYwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_internet_gateway",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:internet-gateway/igw-03ee9ee343730db6c",
+            "id": "igw-03ee9ee343730db6c",
+            "owner_id": "377786476154",
+            "tags": {
+              "Name": "sonar-igw"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-igw",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-0bbd56407374bda85"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjoxMjAwMDAwMDAwMDAwLCJkZWxldGUiOjEyMDAwMDAwMDAwMDAsInVwZGF0ZSI6MTIwMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_key_pair",
+      "name": "deploy",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:key-pair/sonar-deploy",
+            "fingerprint": "eiP7EQx3vniGPtSMC9i3JDWkU6X/NQGrP5qzWD+lKhQ=",
+            "id": "sonar-deploy",
+            "key_name": "sonar-deploy",
+            "key_name_prefix": "",
+            "key_pair_id": "key-0ac05db05deb04b08",
+            "key_type": "ed25519",
+            "public_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcjDeqStU70L2swBOL3E4IJgwnDt3EwR5e3A8iBuTC2 sonar-deploy-yui-20260304",
+            "tags": {
+              "Name": "sonar-deploy-key"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-deploy-key",
+              "Project": "sonar"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ=="
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route",
+      "name": "ipv4_default",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "carrier_gateway_id": "",
+            "core_network_arn": "",
+            "destination_cidr_block": "0.0.0.0/0",
+            "destination_ipv6_cidr_block": "",
+            "destination_prefix_list_id": "",
+            "egress_only_gateway_id": "",
+            "gateway_id": "igw-03ee9ee343730db6c",
+            "id": "r-rtb-0d3074c10238f401c1080289494",
+            "instance_id": "",
+            "instance_owner_id": "",
+            "local_gateway_id": "",
+            "nat_gateway_id": "",
+            "network_interface_id": "",
+            "origin": "CreateRoute",
+            "route_table_id": "rtb-0d3074c10238f401c",
+            "state": "active",
+            "timeouts": null,
+            "transit_gateway_id": "",
+            "vpc_endpoint_id": "",
+            "vpc_peering_connection_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_internet_gateway.main",
+            "aws_route_table.public",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route",
+      "name": "ipv6_default",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "carrier_gateway_id": "",
+            "core_network_arn": "",
+            "destination_cidr_block": "",
+            "destination_ipv6_cidr_block": "::/0",
+            "destination_prefix_list_id": "",
+            "egress_only_gateway_id": "",
+            "gateway_id": "igw-03ee9ee343730db6c",
+            "id": "r-rtb-0d3074c10238f401c2750132062",
+            "instance_id": "",
+            "instance_owner_id": "",
+            "local_gateway_id": "",
+            "nat_gateway_id": "",
+            "network_interface_id": "",
+            "origin": "CreateRoute",
+            "route_table_id": "rtb-0d3074c10238f401c",
+            "state": "active",
+            "timeouts": null,
+            "transit_gateway_id": "",
+            "vpc_endpoint_id": "",
+            "vpc_peering_connection_id": ""
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_internet_gateway.main",
+            "aws_route_table.public",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:route-table/rtb-0d3074c10238f401c",
+            "id": "rtb-0d3074c10238f401c",
+            "owner_id": "377786476154",
+            "propagating_vgws": [],
+            "route": [
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "igw-03ee9ee343730db6c",
+                "ipv6_cidr_block": "::/0",
+                "local_gateway_id": "",
+                "nat_gateway_id": "",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              },
+              {
+                "carrier_gateway_id": "",
+                "cidr_block": "0.0.0.0/0",
+                "core_network_arn": "",
+                "destination_prefix_list_id": "",
+                "egress_only_gateway_id": "",
+                "gateway_id": "igw-03ee9ee343730db6c",
+                "ipv6_cidr_block": "",
+                "local_gateway_id": "",
+                "nat_gateway_id": "",
+                "network_interface_id": "",
+                "transit_gateway_id": "",
+                "vpc_endpoint_id": "",
+                "vpc_peering_connection_id": ""
+              }
+            ],
+            "tags": {
+              "Name": "sonar-public-rt"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-public-rt",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-0bbd56407374bda85"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_route_table_association",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "gateway_id": "",
+            "id": "rtbassoc-05f756c065ad908be",
+            "route_table_id": "rtb-0d3074c10238f401c",
+            "subnet_id": "subnet-0b75ce4324308522c",
+            "timeouts": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMDAsImRlbGV0ZSI6MzAwMDAwMDAwMDAwLCJ1cGRhdGUiOjEyMDAwMDAwMDAwMH19",
+          "dependencies": [
+            "aws_route_table.public",
+            "aws_subnet.public",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_security_group",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group/sg-037c37a112ab38fb7",
+            "description": "Sonar application access",
+            "egress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "",
+                "from_port": 0,
+                "ipv6_cidr_blocks": [
+                  "::/0"
+                ],
+                "prefix_list_ids": [],
+                "protocol": "-1",
+                "security_groups": [],
+                "self": false,
+                "to_port": 0
+              }
+            ],
+            "id": "sg-037c37a112ab38fb7",
+            "ingress": [
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "HTTP (ACME challenge + redirect)",
+                "from_port": 80,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 80
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "HTTPS",
+                "from_port": 443,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 443
+              },
+              {
+                "cidr_blocks": [
+                  "0.0.0.0/0"
+                ],
+                "description": "SSH",
+                "from_port": 22,
+                "ipv6_cidr_blocks": [],
+                "prefix_list_ids": [],
+                "protocol": "tcp",
+                "security_groups": [],
+                "self": false,
+                "to_port": 22
+              }
+            ],
+            "name": "sonar-app-20260304050620801600000002",
+            "name_prefix": "sonar-app-",
+            "owner_id": "377786476154",
+            "revoke_rules_on_delete": false,
+            "tags": {
+              "Name": "sonar-app-sg"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-app-sg",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-0bbd56407374bda85"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6OTAwMDAwMDAwMDAwfSwic2NoZW1hX3ZlcnNpb24iOiIxIn0=",
+          "dependencies": [
+            "aws_vpc.main"
+          ],
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_subnet",
+      "name": "public",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:subnet/subnet-0b75ce4324308522c",
+            "assign_ipv6_address_on_creation": true,
+            "availability_zone": "ap-northeast-1d",
+            "availability_zone_id": "apne1-az2",
+            "cidr_block": "10.2.1.0/24",
+            "customer_owned_ipv4_pool": "",
+            "enable_dns64": false,
+            "enable_lni_at_device_index": 0,
+            "enable_resource_name_dns_a_record_on_launch": false,
+            "enable_resource_name_dns_aaaa_record_on_launch": false,
+            "id": "subnet-0b75ce4324308522c",
+            "ipv6_cidr_block": "2406:da14:1a01:f201::/64",
+            "ipv6_cidr_block_association_id": "subnet-cidr-assoc-0d99e6617e78aff0d",
+            "ipv6_native": false,
+            "map_customer_owned_ip_on_launch": false,
+            "map_public_ip_on_launch": true,
+            "outpost_arn": "",
+            "owner_id": "377786476154",
+            "private_dns_hostname_type_on_launch": "ip-name",
+            "tags": {
+              "Name": "sonar-public"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-public",
+              "Project": "sonar"
+            },
+            "timeouts": null,
+            "vpc_id": "vpc-0bbd56407374bda85"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjo2MDAwMDAwMDAwMDAsImRlbGV0ZSI6MTIwMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMSJ9",
+          "dependencies": [
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc",
+      "name": "main",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 1,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:vpc/vpc-0bbd56407374bda85",
+            "assign_generated_ipv6_cidr_block": true,
+            "cidr_block": "10.2.0.0/16",
+            "default_network_acl_id": "acl-0c4e14baee8b77a8d",
+            "default_route_table_id": "rtb-035c0f22645615a53",
+            "default_security_group_id": "sg-04027c1655a82fc97",
+            "dhcp_options_id": "dopt-001d48fb0a5de7489",
+            "enable_dns_hostnames": true,
+            "enable_dns_support": true,
+            "enable_network_address_usage_metrics": false,
+            "id": "vpc-0bbd56407374bda85",
+            "instance_tenancy": "default",
+            "ipv4_ipam_pool_id": null,
+            "ipv4_netmask_length": null,
+            "ipv6_association_id": "vpc-cidr-assoc-09a9c7567b34c2b35",
+            "ipv6_cidr_block": "2406:da14:1a01:f200::/56",
+            "ipv6_cidr_block_network_border_group": "ap-northeast-1",
+            "ipv6_ipam_pool_id": "",
+            "ipv6_netmask_length": 0,
+            "main_route_table_id": "rtb-035c0f22645615a53",
+            "owner_id": "377786476154",
+            "tags": {
+              "Name": "sonar-vpc"
+            },
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Name": "sonar-vpc",
+              "Project": "sonar"
+            }
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJzY2hlbWFfdmVyc2lvbiI6IjEifQ==",
+          "create_before_destroy": true
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc_security_group_egress_rule",
+      "name": "all_ipv4",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group-rule/sgr-0a1618cab8d276796",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": null,
+            "from_port": null,
+            "id": "sgr-0a1618cab8d276796",
+            "ip_protocol": "-1",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "security_group_id": "sg-037c37a112ab38fb7",
+            "security_group_rule_id": "sgr-0a1618cab8d276796",
+            "tags": null,
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "to_port": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_security_group.app",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc_security_group_egress_rule",
+      "name": "all_ipv6",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group-rule/sgr-0168a196a1a018084",
+            "cidr_ipv4": null,
+            "cidr_ipv6": "::/0",
+            "description": null,
+            "from_port": null,
+            "id": "sgr-0168a196a1a018084",
+            "ip_protocol": "-1",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "security_group_id": "sg-037c37a112ab38fb7",
+            "security_group_rule_id": "sgr-0168a196a1a018084",
+            "tags": null,
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "to_port": null
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_security_group.app",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "http",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group-rule/sgr-0b46dec953475870d",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "HTTP (ACME challenge + redirect)",
+            "from_port": 80,
+            "id": "sgr-0b46dec953475870d",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "security_group_id": "sg-037c37a112ab38fb7",
+            "security_group_rule_id": "sgr-0b46dec953475870d",
+            "tags": null,
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "to_port": 80
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_security_group.app",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "https",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group-rule/sgr-0425b10abe6717cf9",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "HTTPS",
+            "from_port": 443,
+            "id": "sgr-0425b10abe6717cf9",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "security_group_id": "sg-037c37a112ab38fb7",
+            "security_group_rule_id": "sgr-0425b10abe6717cf9",
+            "tags": null,
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "to_port": 443
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_security_group.app",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "aws_vpc_security_group_ingress_rule",
+      "name": "ssh",
+      "provider": "provider[\"registry.terraform.io/hashicorp/aws\"]",
+      "instances": [
+        {
+          "schema_version": 0,
+          "attributes": {
+            "arn": "arn:aws:ec2:ap-northeast-1:377786476154:security-group-rule/sgr-0c7c15525dc6f60e5",
+            "cidr_ipv4": "0.0.0.0/0",
+            "cidr_ipv6": null,
+            "description": "SSH",
+            "from_port": 22,
+            "id": "sgr-0c7c15525dc6f60e5",
+            "ip_protocol": "tcp",
+            "prefix_list_id": null,
+            "referenced_security_group_id": null,
+            "security_group_id": "sg-037c37a112ab38fb7",
+            "security_group_rule_id": "sgr-0c7c15525dc6f60e5",
+            "tags": null,
+            "tags_all": {
+              "Environment": "prod",
+              "ManagedBy": "terraform",
+              "Project": "sonar"
+            },
+            "to_port": 22
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "dependencies": [
+            "aws_security_group.app",
+            "aws_vpc.main"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "cloudflare_record",
+      "name": "app",
+      "provider": "provider[\"registry.terraform.io/cloudflare/cloudflare\"]",
+      "instances": [
+        {
+          "index_key": "prod",
+          "schema_version": 3,
+          "attributes": {
+            "allow_overwrite": true,
+            "comment": "Managed by Terraform",
+            "content": "35.75.70.91",
+            "created_on": "2026-03-04T05:06:59.61203Z",
+            "data": [],
+            "hostname": "app.baisoku-survey.plural-reality.com",
+            "id": "203f3dfe0b76bcf7599dc9a73bd1fc1c",
+            "metadata": {},
+            "modified_on": "2026-03-04T05:06:59.61203Z",
+            "name": "app.baisoku-survey",
+            "priority": null,
+            "proxiable": true,
+            "proxied": false,
+            "tags": [],
+            "timeouts": null,
+            "ttl": 1,
+            "type": "A",
+            "value": null,
+            "zone_id": "308afb757fb09a278f0468622c036886"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMyJ9",
+          "dependencies": [
+            "aws_eip.app",
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        },
+        {
+          "index_key": "staging",
+          "schema_version": 3,
+          "attributes": {
+            "allow_overwrite": true,
+            "comment": "Managed by Terraform",
+            "content": "18.178.160.195",
+            "created_on": "2026-03-05T14:47:23.00101Z",
+            "data": [],
+            "hostname": "staging.baisoku-survey.plural-reality.com",
+            "id": "dcf9cffc8e69deaa3e063932a9218c9b",
+            "metadata": {},
+            "modified_on": "2026-03-05T14:47:23.00101Z",
+            "name": "staging.baisoku-survey",
+            "priority": null,
+            "proxiable": true,
+            "proxied": false,
+            "tags": null,
+            "timeouts": null,
+            "ttl": 1,
+            "type": "A",
+            "value": null,
+            "zone_id": "308afb757fb09a278f0468622c036886"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMyJ9",
+          "dependencies": [
+            "aws_eip.app",
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "managed",
+      "type": "cloudflare_record",
+      "name": "supabase",
+      "provider": "provider[\"registry.terraform.io/cloudflare/cloudflare\"]",
+      "instances": [
+        {
+          "index_key": "prod",
+          "schema_version": 3,
+          "attributes": {
+            "allow_overwrite": true,
+            "comment": "Managed by Terraform",
+            "content": "35.75.70.91",
+            "created_on": "2026-03-04T05:06:59.617032Z",
+            "data": [],
+            "hostname": "supabase.baisoku-survey.plural-reality.com",
+            "id": "e438babc7bb2e8f85d747367714f77ae",
+            "metadata": {},
+            "modified_on": "2026-03-04T05:06:59.617032Z",
+            "name": "supabase.baisoku-survey",
+            "priority": null,
+            "proxiable": true,
+            "proxied": false,
+            "tags": [],
+            "timeouts": null,
+            "ttl": 1,
+            "type": "A",
+            "value": null,
+            "zone_id": "308afb757fb09a278f0468622c036886"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMyJ9",
+          "dependencies": [
+            "aws_eip.app",
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        },
+        {
+          "index_key": "staging",
+          "schema_version": 3,
+          "attributes": {
+            "allow_overwrite": true,
+            "comment": "Managed by Terraform",
+            "content": "18.178.160.195",
+            "created_on": "2026-03-05T14:47:22.989535Z",
+            "data": [],
+            "hostname": "staging-supabase.baisoku-survey.plural-reality.com",
+            "id": "ef059df9e8bc1bb6fe64e64f1492eaa9",
+            "metadata": {},
+            "modified_on": "2026-03-05T14:47:22.989535Z",
+            "name": "staging-supabase.baisoku-survey",
+            "priority": null,
+            "proxiable": true,
+            "proxied": false,
+            "tags": null,
+            "timeouts": null,
+            "ttl": 1,
+            "type": "A",
+            "value": null,
+            "zone_id": "308afb757fb09a278f0468622c036886"
+          },
+          "sensitive_attributes": [],
+          "identity_schema_version": 0,
+          "private": "eyJlMmJmYjczMC1lY2FhLTExZTYtOGY4OC0zNDM2M2JjN2M0YzAiOnsiY3JlYXRlIjozMDAwMDAwMDAwMCwidXBkYXRlIjozMDAwMDAwMDAwMH0sInNjaGVtYV92ZXJzaW9uIjoiMyJ9",
+          "dependencies": [
+            "aws_eip.app",
+            "aws_iam_instance_profile.ec2_sops",
+            "aws_iam_role.ec2_sops",
+            "aws_instance.app",
+            "aws_key_pair.deploy",
+            "aws_security_group.app",
+            "aws_subnet.public",
+            "aws_vpc.main",
+            "data.aws_ami.nixos"
+          ]
+        }
+      ]
+    }
+  ],
+  "check_results": null
+}
