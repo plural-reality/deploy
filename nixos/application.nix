@@ -4,13 +4,11 @@
   pkgs,
   lib,
   config,
-  sonar-app,
   ...
 }:
 
 let
-  supabaseDir = "/var/lib/sonar-deploy/repo/supabase";
-  kongTemplate = "${supabaseDir}/volumes/api/kong.yml.template";
+  supabaseDir = "/var/lib/supabase";
 in
 {
   options.sonar = {
@@ -98,25 +96,31 @@ in
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
+        StateDirectory = "supabase";
         WorkingDirectory = supabaseDir;
         TimeoutStartSec = 300;
 
-        # 1. Copy SOPS-rendered .env to Docker Compose working directory
-        # 2. Generate kong.yml from template with injected keys
+        # 1. Sync docker-compose.yml and templates from nix store
+        # 2. Render .env from SOPS and kong.yml from template
         ExecStartPre = pkgs.writeShellScript "supabase-prepare" ''
           set -euo pipefail
 
-          # Copy rendered .env
+          # Sync static files from nix store (read-only) to writable state dir
+          cp ${config.sonar.supabaseSource}/docker-compose.yml ${supabaseDir}/
+          ${pkgs.coreutils}/bin/mkdir -p ${supabaseDir}/volumes/api ${supabaseDir}/volumes/db
+          cp ${config.sonar.supabaseSource}/volumes/db/init-migrations.sh ${supabaseDir}/volumes/db/
+
+          # Render .env from SOPS template
           cp ${config.sops.templates."supabase-env".path} ${supabaseDir}/.env
 
-          # Generate kong.yml from template
-          ANON_KEY=$(cat /run/secrets/anon_key 2>/dev/null || ${pkgs.coreutils}/bin/cat ${config.sops.secrets."anon_key".path})
-          SERVICE_ROLE_KEY=$(cat /run/secrets/service_role_key 2>/dev/null || ${pkgs.coreutils}/bin/cat ${config.sops.secrets."service_role_key".path})
+          # Generate kong.yml from template with injected keys
+          ANON_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."anon_key".path})
+          SERVICE_ROLE_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."service_role_key".path})
 
           ${pkgs.gnused}/bin/sed \
             -e "s|ANON_KEY_PLACEHOLDER|$ANON_KEY|g" \
             -e "s|SERVICE_ROLE_KEY_PLACEHOLDER|$SERVICE_ROLE_KEY|g" \
-            ${kongTemplate} > ${supabaseDir}/volumes/api/kong.yml
+            ${config.sonar.supabaseSource}/volumes/api/kong.yml.template > ${supabaseDir}/volumes/api/kong.yml
         '';
 
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
@@ -144,10 +148,10 @@ in
         Type = "simple";
         User = "sonar";
         Group = "sonar";
-        WorkingDirectory = "${sonar-app}/app";
+        WorkingDirectory = "${config.sonar.package}/app";
         # Use the sonar wrapper: validates env vars via sonar-check-env, then
         # starts Node.js from the app's own nixpkgs (not deploy's pkgs.nodejs_22).
-        ExecStart = "${sonar-app}/bin/sonar";
+        ExecStart = "${config.sonar.package}/bin/sonar";
         EnvironmentFile = config.sops.templates."nextjs-env".path;
         Restart = "always";
         RestartSec = 5;

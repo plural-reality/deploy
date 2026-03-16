@@ -22,39 +22,34 @@
       system = "aarch64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
 
-      mkNode =
-        {
-          hostname,
-          environment,
-          domain,
-          supabaseDomain,
-        }:
+      # Generic NixOS node builder — no app knowledge.
+      mkNixOSNode =
+        { hostname, modules ? [] }:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = {
-            sonar-app = sonar.packages.${system}.sonar;
-            inherit (sonar) envContract;
-            sonarInputUrl = sonar.url;
-          };
           modules = [
             sops-nix.nixosModules.sops
             ./nixos/infrastructure.nix
-            ./nixos/application.nix
-            ./nixos/deploy.nix
-            ./nixos/secrets.nix
-            ./nixos/version.nix
             {
               networking.hostName = hostname;
               system.configurationRevision = self.rev or self.dirtyRev or "dirty";
-
-              sonar = {
-                inherit domain supabaseDomain;
-                secretsEnvironment = environment;
-                deploy.enable = true;
-              };
             }
-          ];
+          ] ++ modules;
         };
+
+      # Per-environment data for Sonar NixOS nodes.
+      sonarNodes = {
+        # sonar-prod = {
+        #   environment = "prod";
+        #   domain = "app.baisoku-survey.plural-reality.com";
+        #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
+        # };
+        sonar-staging = {
+          environment = "staging";
+          domain = "staging.baisoku-survey.plural-reality.com";
+          supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
+        };
+      };
 
       # Customer (non-NixOS) EC2: sonar wrapped with sops exec-env.
       # Encrypted secrets live in nix store; decrypted in-memory at runtime via IAM/KMS.
@@ -79,20 +74,6 @@
             exec sops exec-env ${secretsFile} "node ${sonarPkg}/app/server.js"
           '';
         };
-      nodeDefinitions = {
-        # sonar-prod = {
-        #   hostname = "sonar-prod";
-        #   environment = "prod";
-        #   domain = "app.baisoku-survey.plural-reality.com";
-        #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-        # };
-        sonar-staging = {
-          hostname = "sonar-staging";
-          environment = "staging";
-          domain = "staging.baisoku-survey.plural-reality.com";
-          supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
-        };
-      };
       devSystems = [
         "aarch64-darwin"
         "x86_64-darwin"
@@ -101,7 +82,25 @@
       ];
     in
     {
-      nixosConfigurations = builtins.mapAttrs (_: cfg: mkNode cfg) nodeDefinitions;
+      nixosConfigurations = builtins.mapAttrs (
+        hostname: cfg:
+        mkNixOSNode {
+          inherit hostname;
+          modules = [
+            ./nixos/sonar.nix
+            {
+              sonar = {
+                package = sonar.packages.${system}.sonar;
+                inputUrl = sonar.url;
+                supabaseSource = ./supabase;
+                inherit (cfg) domain supabaseDomain;
+                secretsEnvironment = cfg.environment;
+                deploy.enable = true;
+              };
+            }
+          ];
+        }
+      ) sonarNodes;
 
       packages.${system} = {
         cybozu-prd = mkCustomerPackage {
@@ -111,7 +110,7 @@
       };
 
       # Lightweight metadata for tooling — evaluates without building NixOS configs.
-      meta.nodes = builtins.mapAttrs (_: cfg: { inherit (cfg) domain; }) nodeDefinitions;
+      meta.nodes = builtins.mapAttrs (_: cfg: { inherit (cfg) domain; }) sonarNodes;
 
       devShells = builtins.listToAttrs (
         builtins.map (s: {

@@ -1,12 +1,10 @@
 # Polling-based self-deploy
 # Every pollInterval, rebuilds from github:plural-reality/deploy#<hostname>
 # with --override-input sonar to track latest app rev.
-# Uses switch-to-configuration test → smoke → commit for safe rollback.
 {
   config,
   lib,
   pkgs,
-  sonarInputUrl,
   ...
 }:
 
@@ -21,30 +19,17 @@ let
   deployScript = pkgs.writeShellScript "sonar-deploy" ''
     set -euo pipefail
 
-    /run/current-system/sw/bin/nixos-rebuild build \
-      --flake ${lib.escapeShellArg flakeRef} \
-      --override-input sonar ${lib.escapeShellArg sonarInputUrl} \
-      --refresh
+    rebuild() {
+      ${pkgs.nixos-rebuild}/bin/nixos-rebuild "$@" \
+        --flake ${lib.escapeShellArg flakeRef} \
+        --override-input sonar ${lib.escapeShellArg config.sonar.inputUrl}
+    }
 
-    NEW=$(readlink -f result)
-    CURRENT=$(readlink -f /run/current-system)
+    rebuild build --refresh
 
-    [ "$NEW" = "$CURRENT" ] && { echo "No changes"; exit 0; }
-    echo "=== Change: $CURRENT -> $NEW ==="
+    [ "$(readlink -f result)" = "$(readlink -f /run/current-system)" ] && { echo "No changes"; exit 0; }
 
-    "$NEW/bin/switch-to-configuration" test
-
-    sleep 5
-    ${pkgs.curl}/bin/curl -sf --max-time 30 --retry 3 --retry-delay 5 \
-      http://localhost:3000 || {
-        echo "ERROR: Smoke test failed. Rolling back..."
-        "$CURRENT/bin/switch-to-configuration" switch
-        exit 1
-      }
-
-    ${pkgs.nix}/bin/nix-env --profile /nix/var/nix/profiles/system --set "$NEW"
-    "$NEW/bin/switch-to-configuration" switch
-    echo "=== Deploy complete at $(date -Iseconds) ==="
+    rebuild switch
   '';
 in
 {

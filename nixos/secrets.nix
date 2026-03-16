@@ -4,7 +4,7 @@
 #   1. `sops secrets/sonar/{stg,prd}.yaml` → add the key
 #   2. Add a `secrets."key_name"` declaration below
 #   3. Add the corresponding line to the nextjs-env template
-{ config, lib, envContract, ... }:
+{ config, lib, ... }:
 
 let
   environment = config.sonar.secretsEnvironment;
