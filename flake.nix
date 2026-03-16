@@ -22,7 +22,14 @@
     }:
     let
       system = "aarch64-linux";
-      mkNixOSNode = import ./lib/mkNixOSNode.nix { inherit nixpkgs sops-nix self system; };
+      mkNixOSNode = import ./lib/mkNixOSNode.nix {
+        inherit
+          nixpkgs
+          sops-nix
+          self
+          system
+          ;
+      };
       mkSonarNode = import ./lib/mkSonarNode.nix {
         inherit mkNixOSNode;
         inherit (nixpkgs) lib;
@@ -34,21 +41,27 @@
     in
     {
       # --- NixOS Nodes ---
-      nixosConfigurations = builtins.mapAttrs mkSonarNode {
-        sonar-staging = {
-          domain = "staging.baisoku-survey.plural-reality.com";
-          supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
+      nixosConfigurations =
+        builtins.mapAttrs mkSonarNode {
+          sonar-staging = {
+            domain = "staging.baisoku-survey.plural-reality.com";
+            supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
+            secretsFile = ./secrets/sonar/stg.yaml;
+            appRev = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=main";
+          };
+          # sonar-prod = {
+          #   domain = "app.baisoku-survey.plural-reality.com";
+          #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
+          #   secretsFile = ./secrets/sonar/prd.yaml;
+          #   appRev = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=stable";
+          # };
+        }
+        // {
+          sonar-staging-bootstrap = mkNixOSNode {
+            hostname = "sonar-staging";
+            modules = [ ./nixos/deploy.nix ];
+          };
         };
-        # sonar-prod = {
-        #   domain = "app.baisoku-survey.plural-reality.com";
-        #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
-        # };
-      } // {
-        sonar-staging-bootstrap = mkNixOSNode {
-          hostname = "sonar-staging";
-          modules = [ ./nixos/deploy.nix ];
-        };
-      };
 
       # --- Customer (non-NixOS) Packages ---
       packages.${system}.cybozu-prd = mkCustomerPackage {
@@ -59,7 +72,13 @@
     }
     // flake-utils.lib.eachDefaultSystem (s: {
       devShells.default = nixpkgs.legacyPackages.${s}.mkShell {
-        packages = with nixpkgs.legacyPackages.${s}; [ terraform sops awscli2 jq curl ];
+        packages = with nixpkgs.legacyPackages.${s}; [
+          terraform
+          sops
+          awscli2
+          jq
+          curl
+        ];
       };
     });
 }
