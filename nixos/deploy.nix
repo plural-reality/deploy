@@ -14,7 +14,11 @@ let
   gitSshCommand = "${pkgs.openssh}/bin/ssh -i ${sshKeyPath} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null";
 
   overrideFlags = lib.concatLists (
-    lib.mapAttrsToList (name: url: [ "--override-input" name url ]) cfg.appInputs
+    lib.mapAttrsToList (name: url: [
+      "--override-input"
+      name
+      url
+    ]) cfg.appInputs
   );
 
   deployScript = pkgs.writeShellScript "sonar-deploy" ''
@@ -50,9 +54,18 @@ in
   options.sonar.deploy = {
     enable = lib.mkEnableOption "polling-based self-deploy";
     nodeName = lib.mkOption { type = lib.types.str; };
-    trackBranch = lib.mkOption { type = lib.types.str; default = "main"; };
-    appInputs = lib.mkOption { type = lib.types.attrsOf lib.types.str; default = { }; };
-    pollInterval = lib.mkOption { type = lib.types.str; default = "5min"; };
+    trackBranch = lib.mkOption {
+      type = lib.types.str;
+      default = "main";
+    };
+    appInputs = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+    };
+    pollInterval = lib.mkOption {
+      type = lib.types.str;
+      default = "1min";
+    };
   };
 
   config = lib.mkIf cfg.enable {
