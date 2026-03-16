@@ -59,7 +59,12 @@
         // {
           sonar-staging-bootstrap = mkNixOSNode {
             hostname = "sonar-staging";
-            modules = [ ./nixos/deploy.nix ];
+            modules = [
+              ./nixos/deploy.nix
+              {
+                deploy.overrideInputs.sonar = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=main";
+              }
+            ];
           };
         };
 
