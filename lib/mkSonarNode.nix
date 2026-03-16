@@ -1,13 +1,17 @@
 # Per-app builder for Sonar NixOS nodes.
-# Signature: hostname -> { domain, supabaseDomain } -> nixosSystem
-# environment is derived from hostname by stripping "sonar-" prefix.
+# Signature: hostname -> { domain, supabaseDomain, secretsFile, appRef } -> nixosSystem
 {
   mkNixOSNode,
   sonarPackage,
   lib,
 }:
 hostname:
-{ domain, supabaseDomain }:
+{
+  domain,
+  supabaseDomain,
+  secretsFile,
+  appRef,
+}:
 mkNixOSNode {
   inherit hostname;
   modules = [
@@ -16,9 +20,9 @@ mkNixOSNode {
       sonar = {
         package = sonarPackage;
         supabaseSource = ../supabase;
-        inherit domain supabaseDomain;
-        secretsEnvironment = lib.removePrefix "sonar-" hostname;
+        inherit domain supabaseDomain secretsFile;
       };
+      deploy.overrideInputs.sonar = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=${appRef}";
     }
   ];
 }

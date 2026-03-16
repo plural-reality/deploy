@@ -7,20 +7,15 @@
 { config, lib, ... }:
 
 let
-  environment = config.sonar.secretsEnvironment;
-  envFile = { prod = "prd"; staging = "stg"; }.${environment};
+  hostname = config.networking.hostName;
+  environment = lib.removePrefix "sonar-" hostname;
   domain = config.sonar.domain;
   supabaseDomain = config.sonar.supabaseDomain;
   p = config.sops.placeholder;
 in
 {
-  options.sonar.secretsEnvironment = lib.mkOption {
-    type = lib.types.enum [ "prod" "staging" ];
-    description = "Which SOPS secret file to use (secrets/sonar/{prd,stg}.yaml)";
-  };
-
   config.sops = {
-    defaultSopsFile = ../secrets/sonar/${envFile}.yaml;
+    defaultSopsFile = config.sonar.secretsFile;
 
     # KMS-only decryption (no age/pgp keys)
     age = { };

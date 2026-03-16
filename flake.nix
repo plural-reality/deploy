@@ -47,13 +47,13 @@
             domain = "staging.baisoku-survey.plural-reality.com";
             supabaseDomain = "staging-supabase.baisoku-survey.plural-reality.com";
             secretsFile = ./secrets/sonar/stg.yaml;
-            appRev = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=main";
+            appRef = "main";
           };
           # sonar-prod = {
           #   domain = "app.baisoku-survey.plural-reality.com";
           #   supabaseDomain = "supabase.baisoku-survey.plural-reality.com";
           #   secretsFile = ./secrets/sonar/prd.yaml;
-          #   appRev = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=stable";
+          #   appRef = "stable";
           # };
         }
         // {

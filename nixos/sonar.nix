@@ -19,5 +19,10 @@
       type = lib.types.path;
       description = "Path to supabase configuration directory";
     };
+
+    secretsFile = lib.mkOption {
+      type = lib.types.path;
+      description = "SOPS YAML file for this environment's secrets";
+    };
   };
 }
