@@ -124,6 +124,24 @@ in
         '';
 
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
+
+        # Sync DB role passwords with current SOPS value on every start.
+        # The supabase image only sets these during first initdb; if the
+        # SOPS secret rotates afterward the DB retains the stale password.
+        ExecStartPost = pkgs.writeShellScript "supabase-sync-passwords" ''
+          set -euo pipefail
+          PW=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."postgres_password".path})
+          # wait for db healthy (healthcheck interval=5s, retries=10 → 50s max)
+          for i in $(seq 1 20); do
+            ${pkgs.docker-compose}/bin/docker-compose exec -T db \
+              pg_isready -U supabase_admin -d postgres >/dev/null 2>&1 && break
+            sleep 2
+          done
+          ${pkgs.docker-compose}/bin/docker-compose exec -T db \
+            env PGPASSWORD="$PW" psql -U supabase_admin -d postgres -c \
+            "ALTER ROLE supabase_auth_admin WITH PASSWORD '$PW'; ALTER ROLE authenticator WITH PASSWORD '$PW';"
+        '';
+
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
       };
     };
