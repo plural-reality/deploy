@@ -90,13 +90,9 @@ in
       after = [
         "docker.service"
         "network-online.target"
-        "deploy-repo-init.service"
       ];
       wants = [ "network-online.target" ];
-      requires = [
-        "docker.service"
-        "deploy-repo-init.service"
-      ];
+      requires = [ "docker.service" ];
       wantedBy = [ "multi-user.target" ];
 
       serviceConfig = {

@@ -1,23 +1,14 @@
 # SOPS secret declarations — decrypted at boot by sops-nix via IAM Instance Profile -> KMS
 #
-# The canonical env var contract lives in the sonar app repo (env-contract.json),
-# passed here as `envContract` via specialArgs. This module maps each contract var
-# to either a SOPS placeholder (secret) or a NixOS-derived value (non-secret).
-#
-# Optional secret vars not yet in the SOPS YAML are omitted — the app handles
-# their absence gracefully. To add one:
-#   1. `sops secrets/sonar-{staging,prod}.yaml` → add the key
+# To add a secret:
+#   1. `sops secrets/sonar/{stg,prd}.yaml` → add the key
 #   2. Add a `secrets."key_name"` declaration below
 #   3. Add the corresponding line to the nextjs-env template
-#
-# Currently missing optional secrets:
-#   - notification_secret       → NOTIFICATION_SECRET
-#   - google_service_account_key → GOOGLE_SERVICE_ACCOUNT_KEY
-#   - vertex_api_key            → VERTEX_API_KEY
 { config, lib, envContract, ... }:
 
 let
   environment = config.sonar.secretsEnvironment;
+  envFile = { prod = "prd"; staging = "stg"; }.${environment};
   domain = config.sonar.domain;
   supabaseDomain = config.sonar.supabaseDomain;
   p = config.sops.placeholder;
@@ -25,11 +16,11 @@ in
 {
   options.sonar.secretsEnvironment = lib.mkOption {
     type = lib.types.enum [ "prod" "staging" ];
-    description = "Which SOPS secret file to use (sonar-prod.yaml or sonar-staging.yaml)";
+    description = "Which SOPS secret file to use (secrets/sonar/{prd,stg}.yaml)";
   };
 
   config.sops = {
-    defaultSopsFile = ../secrets/sonar-${environment}.yaml;
+    defaultSopsFile = ../secrets/sonar/${envFile}.yaml;
 
     # KMS-only decryption (no age/pgp keys)
     age = { };
