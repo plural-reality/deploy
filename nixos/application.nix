@@ -1,5 +1,5 @@
 # Sonar Application Services
-# Next.js frontend + Supabase Docker Compose + nginx reverse proxy
+# Next.js frontend + Supabase Docker Compose + nginx reverse proxy + Docker
 {
   pkgs,
   lib,
@@ -22,7 +22,6 @@ in
       description = "The domain name for Supabase API";
     };
 
-
     acmeEmail = lib.mkOption {
       type = lib.types.str;
       default = "admin@plural-reality.com";
@@ -31,6 +30,36 @@ in
   };
 
   config = {
+    # --- Sonar user ---
+    users.users.sonar = {
+      isSystemUser = true;
+      group = "sonar";
+      home = "/var/lib/sonar";
+      createHome = true;
+      extraGroups = [ "docker" ];
+    };
+    users.groups.sonar = { };
+
+    # --- Docker (for Supabase) ---
+    virtualisation.docker = {
+      enable = true;
+      autoPrune = {
+        enable = true;
+        dates = "weekly";
+      };
+    };
+
+    environment.systemPackages = [ pkgs.docker-compose ];
+
+    # --- IMDS route (Docker veth interfaces steal 169.254.0.0/16) ---
+    # Policy routing: a dedicated table (100) with a high-priority rule.
+    # Docker only modifies the main table; this survives any bridge/veth changes.
+    networking.localCommands = ''
+      ${pkgs.iproute2}/bin/ip rule del to 169.254.169.254/32 lookup 100 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip rule add to 169.254.169.254/32 lookup 100 priority 100
+      ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5 table 100
+    '';
+
     # --- ACME (Let's Encrypt) ---
     security.acme = {
       acceptTerms = true;
@@ -64,8 +93,7 @@ in
             add_header Cache-Control "public, immutable";
           '';
         };
-
-};
+      };
 
       # Supabase domain -> Kong
       virtualHosts."${config.sonar.supabaseDomain}" = {
@@ -100,20 +128,15 @@ in
         WorkingDirectory = supabaseDir;
         TimeoutStartSec = 300;
 
-        # 1. Sync docker-compose.yml and templates from nix store
-        # 2. Render .env from SOPS and kong.yml from template
         ExecStartPre = pkgs.writeShellScript "supabase-prepare" ''
           set -euo pipefail
 
-          # Sync static files from nix store (read-only) to writable state dir
           cp ${config.sonar.supabaseSource}/docker-compose.yml ${supabaseDir}/
           ${pkgs.coreutils}/bin/mkdir -p ${supabaseDir}/volumes/api ${supabaseDir}/volumes/db
           cp ${config.sonar.supabaseSource}/volumes/db/init-migrations.sh ${supabaseDir}/volumes/db/
 
-          # Render .env from SOPS template
           cp ${config.sops.templates."supabase-env".path} ${supabaseDir}/.env
 
-          # Generate kong.yml from template with injected keys
           ANON_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."anon_key".path})
           SERVICE_ROLE_KEY=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."service_role_key".path})
 
@@ -125,13 +148,9 @@ in
 
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
 
-        # Sync DB role passwords with current SOPS value on every start.
-        # The supabase image only sets these during first initdb; if the
-        # SOPS secret rotates afterward the DB retains the stale password.
         ExecStartPost = pkgs.writeShellScript "supabase-sync-passwords" ''
           set -euo pipefail
           PW=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."postgres_password".path})
-          # wait for db healthy (healthcheck interval=5s, retries=10 → 50s max)
           for i in $(seq 1 20); do
             ${pkgs.docker-compose}/bin/docker-compose exec -T db \
               pg_isready -U supabase_admin -d postgres >/dev/null 2>&1 && break
@@ -167,8 +186,6 @@ in
         User = "sonar";
         Group = "sonar";
         WorkingDirectory = "${config.sonar.package}/app";
-        # Use the sonar wrapper: validates env vars via sonar-check-env, then
-        # starts Node.js from the app's own nixpkgs (not deploy's pkgs.nodejs_22).
         ExecStart = "${config.sonar.package}/bin/sonar";
         EnvironmentFile = config.sops.templates."nextjs-env".path;
         Restart = "always";
@@ -176,8 +193,6 @@ in
         OOMScoreAdjust = -900;
       };
     };
-
-    # sops-nix decrypts via activation scripts (before service startup)
 
     networking.firewall.allowedTCPPorts = [
       80

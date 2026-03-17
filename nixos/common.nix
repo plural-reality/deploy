@@ -1,8 +1,10 @@
+# Common NixOS configuration — shared by all app nodes.
+# App-specific concerns (Docker, users, etc.) belong in the app's own module.
 { pkgs, ... }:
 
 {
   config = {
-    # --- Nix daemon resource limits (4GB RAM budget, Docker needs more) ---
+    # --- Nix daemon resource limits (4GB RAM budget) ---
     nix.settings = {
       max-jobs = 1;
       cores = 2;
@@ -33,7 +35,7 @@
       OOMScoreAdjust = 500;
     };
 
-    # --- Swap (2GB — Docker Compose consumes significant RAM) ---
+    # --- Swap (2GB — useful for on-target builds) ---
     swapDevices = [
       {
         device = "/swapfile";
@@ -46,7 +48,6 @@
       vim
       htop
       git
-      docker-compose
     ];
 
     # --- SSH ---
@@ -57,34 +58,6 @@
         PasswordAuthentication = false;
       };
     };
-
-    # --- Docker ---
-    virtualisation.docker = {
-      enable = true;
-      autoPrune = {
-        enable = true;
-        dates = "weekly";
-      };
-    };
-
-    # --- Application user ---
-    users.users.sonar = {
-      isSystemUser = true;
-      group = "sonar";
-      home = "/var/lib/sonar";
-      createHome = true;
-      extraGroups = [ "docker" ];
-    };
-    users.groups.sonar = { };
-
-    # --- IMDS route (Docker veth interfaces steal 169.254.0.0/16) ---
-    # Policy routing: a dedicated table (100) with a high-priority rule.
-    # Docker only modifies the main table; this survives any bridge/veth changes.
-    networking.localCommands = ''
-      ${pkgs.iproute2}/bin/ip rule del to 169.254.169.254/32 lookup 100 2>/dev/null || true
-      ${pkgs.iproute2}/bin/ip rule add to 169.254.169.254/32 lookup 100 priority 100
-      ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5 table 100
-    '';
 
     # --- Firewall ---
     networking.firewall = {

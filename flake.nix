@@ -9,6 +9,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sonar.url = "git+ssh://git@github.com/plural-reality/baisoku-survey";
+    cartographer.url = "git+ssh://git@github.com/plural-reality/cartographer";
   };
 
   outputs =
@@ -18,6 +19,7 @@
       flake-utils,
       sops-nix,
       sonar,
+      cartographer,
       ...
     }:
     let
@@ -34,6 +36,11 @@
         inherit mkNixOSNode;
         inherit (nixpkgs) lib;
         sonarPackage = sonar.packages.${system}.sonar;
+      };
+      mkCartographerNode = import ./lib/mkCartographerNode.nix {
+        inherit mkNixOSNode;
+        inherit (nixpkgs) lib;
+        cartographerPackages = cartographer.packages.${system};
       };
       mkCustomerPackage = import ./lib/mkCustomerPackage.nix {
         pkgs = nixpkgs.legacyPackages.${system};
@@ -56,6 +63,26 @@
           #   appRef = "stable";
           # };
         }
+        // builtins.mapAttrs mkCartographerNode {
+          cartographer-staging = {
+            domain = "staging.baisoku-kaigi.com";
+            efsFileSystemId = "fs-0a3f1c8ae1d63c51b";
+            supabaseUrl = "https://uyuyqdhssttxswmflzrx.supabase.co";
+            supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV5dXlxZGhzc3R0eHN3bWZsenJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MjU1MDgsImV4cCI6MjA3NzAwMTUwOH0.u7iVjncFD_p_9CClxEQ4heejvbmEHFDFfDTG2VoyYXM";
+            workosClientId = "";
+            secretsFile = ./secrets/cartographer/stg.yaml;
+            appRef = "main";
+          };
+          # cartographer-prod = {
+          #   domain = "app.baisoku-kaigi.com";
+          #   efsFileSystemId = "fs-TODO";
+          #   supabaseUrl = "https://TODO.supabase.co";
+          #   supabaseAnonKey = "TODO";
+          #   workosClientId = "TODO";
+          #   secretsFile = ./secrets/cartographer/prd.yaml;
+          #   appRef = "stable";
+          # };
+        }
         // {
           sonar-staging-bootstrap = mkNixOSNode {
             hostname = "sonar-staging";
@@ -63,6 +90,16 @@
               ./nixos/deploy.nix
               {
                 deploy.overrideInputs.sonar = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=main";
+              }
+            ];
+          };
+          cartographer-staging-bootstrap = mkNixOSNode {
+            hostname = "cartographer-staging";
+            modules = [
+              ./nixos/deploy.nix
+              {
+                deploy.appSshKeyName = "cartographer";
+                deploy.overrideInputs.cartographer = "git+ssh://git@github-app/plural-reality/cartographer?ref=main";
               }
             ];
           };
