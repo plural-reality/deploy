@@ -27,6 +27,11 @@ in
       trusted-public-keys = [ "kotto5.cachix.org-1:kIqTVHIxWyPkkiJ24ceZpS6JVvs2BE8GTIA48virk/s=" ];
     };
 
+    # --- Operator SSH access ---
+    users.users.root.openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHcjDeqStU70L2swBOL3E4IJgwnDt3EwR5e3A8iBuTC2 sonar-deploy-yui-20260304"
+    ];
+
     # --- Application user ---
     users.users.cartographer = {
       isSystemUser = true;
