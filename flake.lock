@@ -126,11 +126,11 @@
         "project-m36": "project-m36"
       },
       "locked": {
-        "lastModified": 1773666239,
-        "narHash": "sha256-ZnM7howZ262pCFpi6UUKCIrqzDu8lzKKTKSdLs+1kSE=",
+        "lastModified": 1773726820,
+        "narHash": "sha256-v5zL4rfUxKI5cLe9rYeTKal5uvSWaosnEQeFYedZEyQ=",
         "ref": "refs/heads/main",
-        "rev": "71ae0f868d2efba0023db4eab23f220836f621a1",
-        "revCount": 549,
+        "rev": "ea639b9c038a0010b459a515c4accfff3dbe8948",
+        "revCount": 552,
         "type": "git",
         "url": "ssh://git@github.com/plural-reality/cartographer"
       },
