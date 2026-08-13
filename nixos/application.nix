@@ -61,6 +61,14 @@ in
       ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5 table 100
     '';
 
+    # --- IMDS route (Docker veth interfaces steal 169.254.0.0/16) ---
+    # Keep EC2 role credentials reachable after Docker creates bridge/veth routes.
+    networking.localCommands = ''
+      ${pkgs.iproute2}/bin/ip rule del to 169.254.169.254/32 lookup 100 2>/dev/null || true
+      ${pkgs.iproute2}/bin/ip rule add to 169.254.169.254/32 lookup 100 priority 100
+      ${pkgs.iproute2}/bin/ip route replace 169.254.169.254/32 dev ens5 table 100
+    '';
+
     # --- ACME (Let's Encrypt) ---
     security.acme = {
       acceptTerms = true;
