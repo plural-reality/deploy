@@ -73,6 +73,7 @@ in
         # --- Required (envContract.vars where required = true) ---
         "SONAR_SUPABASE_URL=https://${supabaseDomain}"
         "SONAR_SUPABASE_ANON_KEY=${p."anon_key"}"
+        "SUPABASE_SERVICE_ROLE_KEY=${p."service_role_key"}"
         "OPENROUTER_API_KEY=${p."openrouter_api_key"}"
         "SONAR_BASE_URL=https://${domain}"
         "SONAR_SITE_URL=https://${domain}"
