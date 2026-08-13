@@ -13,6 +13,9 @@ services:
       JWT_SECRET: ${JWT_SECRET}
     volumes:
       - db-data:/var/lib/postgresql/data
+      - ./volumes/db/init-migrations.sh:/docker-entrypoint-initdb.d/zz-app-migrations.sh:ro
+      - ./volumes/db/apply-migrations.sh:/apply-migrations.sh:ro
+      - ./volumes/migrations:/app-migrations:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U supabase_admin -d postgres"]
       interval: 5s

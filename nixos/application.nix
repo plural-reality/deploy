@@ -9,6 +9,7 @@
 
 let
   supabaseDir = "/var/lib/supabase";
+  supabaseMigrations = config.sonar.supabaseMigrations;
 in
 {
   options.sonar = {
@@ -121,6 +122,11 @@ in
       requires = [ "docker.service" ];
       wantedBy = [ "multi-user.target" ];
 
+      restartTriggers = [
+        config.sops.templates."supabase-env".content
+        supabaseMigrations
+      ];
+
       serviceConfig = {
         Type = "oneshot";
         RemainAfterExit = true;
@@ -132,8 +138,10 @@ in
           set -euo pipefail
 
           cp ${config.sonar.supabaseSource}/docker-compose.yml ${supabaseDir}/
-          ${pkgs.coreutils}/bin/mkdir -p ${supabaseDir}/volumes/api ${supabaseDir}/volumes/db
+          ${pkgs.coreutils}/bin/mkdir -p ${supabaseDir}/volumes/api ${supabaseDir}/volumes/db ${supabaseDir}/volumes/migrations
           cp ${config.sonar.supabaseSource}/volumes/db/init-migrations.sh ${supabaseDir}/volumes/db/
+          cp ${config.sonar.supabaseSource}/volumes/db/apply-migrations.sh ${supabaseDir}/volumes/db/
+          cp -r ${supabaseMigrations}/. ${supabaseDir}/volumes/migrations/
 
           cp ${config.sops.templates."supabase-env".path} ${supabaseDir}/.env
 
@@ -148,10 +156,10 @@ in
 
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up -d";
 
-        ExecStartPost = pkgs.writeShellScript "supabase-sync-passwords" ''
+        ExecStartPost = pkgs.writeShellScript "supabase-apply-migrations" ''
           set -euo pipefail
           PW=$(${pkgs.coreutils}/bin/cat ${config.sops.secrets."postgres_password".path})
-          for i in $(seq 1 20); do
+          for i in $(seq 1 60); do
             ${pkgs.docker-compose}/bin/docker-compose exec -T db \
               pg_isready -U supabase_admin -d postgres >/dev/null 2>&1 && break
             sleep 2
@@ -159,6 +167,9 @@ in
           ${pkgs.docker-compose}/bin/docker-compose exec -T db \
             env PGPASSWORD="$PW" psql -U supabase_admin -d postgres -c \
             "ALTER ROLE supabase_auth_admin WITH PASSWORD '$PW'; ALTER ROLE authenticator WITH PASSWORD '$PW';"
+          ${pkgs.docker-compose}/bin/docker-compose exec -T db \
+            env PGPASSWORD="$PW" /apply-migrations.sh
+          ${pkgs.docker-compose}/bin/docker-compose restart rest
         '';
 
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
@@ -172,7 +183,7 @@ in
         "network.target"
         "supabase.service"
       ];
-      wants = [ "supabase.service" ];
+      requires = [ "supabase.service" ];
       wantedBy = [ "multi-user.target" ];
 
       environment = {
@@ -191,6 +202,33 @@ in
         Restart = "always";
         RestartSec = 5;
         OOMScoreAdjust = -900;
+      };
+    };
+
+    systemd.services.sonar-report-delivery = {
+      description = "Sonar report delivery scheduler";
+      after = [ "network-online.target" "sonar.service" ];
+      wants = [ "network-online.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        EnvironmentFile = config.sops.templates."nextjs-env".path;
+        ExecStart = pkgs.writeShellScript "sonar-report-delivery-drain" ''
+          set -euo pipefail
+          ${pkgs.curl}/bin/curl --fail --silent --show-error --max-time 240 \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            http://127.0.0.1:3000/api/internal/report-delivery/drain
+        '';
+        TimeoutStartSec = 300;
+      };
+    };
+
+    systemd.timers.sonar-report-delivery = {
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*-*-* *:*:00";
+        RandomizedDelaySec = "5s";
+        Persistent = true;
       };
     };
 
