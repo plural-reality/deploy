@@ -31,11 +31,25 @@ psql_cmd -c "
   )
 "
 
+# Bootstrap/recovery: public.sessions distinguishes the app schema from
+# Supabase Auth's auth.sessions table. If the tracker was created but no app
+# table exists, discard only the tracker rows and replay the full app history.
+app_table_count=$(psql_cmd -t -A -c "
+  SELECT count(*)
+  FROM pg_catalog.pg_tables
+  WHERE schemaname = 'public' AND tablename <> '_migration_tracking'
+")
+
+if [ "$app_table_count" -eq 0 ]; then
+  psql_cmd -c "TRUNCATE TABLE _migration_tracking"
+  echo "=== No Sonar tables detected: migration tracking reset ==="
+fi
+
 # Bootstrap: 既存 DB に初めて tracking を導入する場合
 # → shipped legacy historyだけを適用済みとして記録し、新規migrationは通常パスで実行する
 if [ "$table_existed" = "f" ]; then
   has_data=$(psql_cmd -t -A -c "
-    SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'sessions')
+    SELECT to_regclass('public.sessions') IS NOT NULL
   ")
 
   if [ "$has_data" = "t" ]; then
