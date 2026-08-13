@@ -31,6 +31,7 @@ in
       # --- App secrets (subset of envContract.vars where secret = true) ---
       "openrouter_api_key" = { };
       "resend_api_key" = { };
+      "cron_secret" = { };
     };
 
     # --- Rendered templates ---
@@ -87,6 +88,7 @@ in
         "VERTEX_MODEL="
         # --- Optional secret (available in SOPS) ---
         "RESEND_API_KEY=${p."resend_api_key"}"
+        "CRON_SECRET=${p."cron_secret"}"
         # --- Optional secret (not yet in SOPS — set empty) ---
         "NOTIFICATION_SECRET="
         "GOOGLE_SERVICE_ACCOUNT_KEY="

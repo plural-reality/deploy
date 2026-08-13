@@ -3,6 +3,7 @@
 {
   mkNixOSNode,
   sonarPackage,
+  sonarMigrations,
   lib,
 }:
 hostname:
@@ -20,6 +21,7 @@ mkNixOSNode {
       sonar = {
         package = sonarPackage;
         supabaseSource = ../supabase;
+        supabaseMigrations = sonarMigrations;
         inherit domain supabaseDomain secretsFile;
       };
       deploy.overrideInputs.sonar = "git+ssh://git@github-app/plural-reality/baisoku-survey?ref=${appRef}";

@@ -36,6 +36,7 @@
         inherit mkNixOSNode;
         inherit (nixpkgs) lib;
         sonarPackage = sonar.packages.${system}.sonar;
+        sonarMigrations = sonar + "/supabase/migrations";
       };
       mkCartographerNode = import ./lib/mkCartographerNode.nix {
         inherit mkNixOSNode;
